@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<component>
+	<?component error="true" debug="true"?>
+	<registration
+		progid="Brackets"
+		description="A powerful Functional Programming Library for VBScript."
+		version="1.00"
+		classid="{20011228-5218-767e-8d85-632171029011}"
+	/>
+	<public>
+		<method name="Set">
+			<PARAMETER name="varVariable"/>
+			<PARAMETER name="varValue"/>
+		</method>
+		<method name="If">
+			<PARAMETER name="boolCondition"/>
+			<PARAMETER name="varTrue"/>
+			<PARAMETER name="varFalse"/>
+		</method>
+	</public>
+	<script language="JScript" src="./Brackets.js" />
+	<script language="VBScript" src="./Brackets.vbs" />
+	<script language="VBScript">
+		<![CDATA[
+			Public Sub [Set](ByRef varVariable, ByRef varValue)
+				[].[Set] varVariable, varValue
+			End Sub
+
+			Public Function [If](ByVal boolCondition, ByRef varTrue, ByRef varFalse)
+				[Set] [If], [].If(boolCondition, varTrue, varFalse)
+			End Function
+		]]>
+	</script>
+</component>
