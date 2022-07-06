@@ -17,17 +17,54 @@
 			<PARAMETER name="varTrue"/>
 			<PARAMETER name="varFalse"/>
 		</method>
+		<method name="Function" internalName="BuildAnonymousFunction">
+			<PARAMETER name="boolCondition"/>
+			<PARAMETER name="strBody"/>
+		</method>
+		<method name="Assert">
+			<PARAMETER name="boolCondition"/>
+			<PARAMETER name="strSource"/>
+			<PARAMETER name="strDescription"/>
+		</method>
+		<method name="ForEach">
+			<PARAMETER name="varSubprogram"/>
+			<PARAMETER name="varCollection"/>
+		</method>
 	</public>
 	<script language="JScript" src="./Brackets.js" />
 	<script language="VBScript" src="./Brackets.vbs" />
 	<script language="VBScript">
 		<![CDATA[
+			Option Explicit
+			Private []
+			Set [] = New Brackets
+
 			Public Sub [Set](ByRef varVariable, ByRef varValue)
 				[].[Set] varVariable, varValue
 			End Sub
 
 			Public Function [If](ByVal boolCondition, ByRef varTrue, ByRef varFalse)
 				[Set] [If], [].If(boolCondition, varTrue, varFalse)
+			End Function
+
+			Public Function BuildAnonymousFunction(ByVal strParameters, ByVal strBody)
+				Set BuildAnonymousFunction = [].[Function](strParameters, strBody)
+			End Function
+
+			Public Sub Assert(ByVal boolCondition, ByVal strSource, ByVal strDescription)
+				[].Assert boolCondition, strSource, strDescription
+			End Sub
+
+			Public Sub ForEach(ByVal varSubprogram, ByRef varCollection)
+				[].ForEach varSubprogram, varCollection
+			End Sub
+
+			Public Function Range(ByVal lngStart, ByVal lngStop, ByVal lngStep)
+				Range = [].Range(lngStart, lngStop, lngStep)
+			End Function
+
+			Public Function Map(ByVal varFunction, ByRef varCollection)
+				Map = [].Map(varFunction, varCollection)
 			End Function
 		]]>
 	</script>
