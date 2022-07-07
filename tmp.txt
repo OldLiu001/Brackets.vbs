@@ -1,3 +1,11 @@
+优先实现列表：map、filter、enum-tree、reduce（accumulate）（设定初始值）、reduce、append、range（enum-interval）、
+enum->map->filter->reduce
+第二组（嵌套）：打平（FLAATEN）（懒惰版的可用reduce实现）、FLATMAP（先MAP再FLAT）、
+
+实现：斐波那契、八皇后
+
+懒惰：树转流、上面的优先列表
+实现：素数筛、自然数、斐波那契、
 
 //WScript.Echo(Brackets.If(true,1,2));
 

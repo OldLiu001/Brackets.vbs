@@ -2,16 +2,12 @@
 	<script src=".\Brackets.js" language="JScript"/>
 	<script src=".\Brackets.vbs" language="VBScript"/>
 	<script language="VBScript">
-	Option Explicit
+	''Option Explicit
 	dim []
 	set [] = new brackets
 	[].Function("","msgbox 1")()
 		
-
-call apply([].Function("wsh,z","wsh.echo z"), array(wsh,9))
-function test(a ,b)
-test = a+b
-end function
-msgbox apply(getref("test"), array(1,9))
+	[].set fso, createobject("scripting.filesystemobject")
+	msgbox join([].CArray(fso.drives)," ")
 	</script>
 </job>

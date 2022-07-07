@@ -30,6 +30,15 @@
 			<PARAMETER name="varSubprogram"/>
 			<PARAMETER name="varCollection"/>
 		</method>
+		<method name="Range">
+			<PARAMETER name="lngStart"/>
+			<PARAMETER name="lngStop"/>
+			<PARAMETER name="lngStep"/>
+		</method>
+		<method name="Map">
+			<PARAMETER name="varFunction"/>
+			<PARAMETER name="varCollection"/>
+		</method>
 	</public>
 	<script language="JScript" src="./Brackets.js" />
 	<script language="VBScript" src="./Brackets.vbs" />
