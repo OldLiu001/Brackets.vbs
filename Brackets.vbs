@@ -20,19 +20,22 @@ Class Brackets
 		End If
 	End Function
 
+	Public Function Lambda(ByVal strParameters, ByVal strBody, ByVal strBindings, ByRef arrBindings)
+		' Argument "strParameters" & "strBind" doesn't support prefix "ByRef" & "ByVal".
+		' Keyword "Return" will help you save return value, but It will not halt the running of Lambda.
+		' You can add "Exit Function" after Return to force Lambda halt and return.
+		' Wherever you want to halt Lambda, use "Exit Function".
+
+		Set Lambda = New AnonymousFunction
+		Lambda.Init strParameters, strBody, strBindings, arrBindings
+		Set Lambda = [_].WrapArguments([_].WrapFunction(Lambda))
+	End Function
+
 	Public Function [Function](ByVal strParameters, ByVal strBody)
 		' A restricted anonymous function generator.
 		' The function it generates can only refer to the arguments & built-in functions in VBScript.
 
-		' Argument "strParameters" doesn't support prefix like "ByRef" & "ByVal".
-		' Keyword "Return" will help you save return value, but It will not halt the running of function.
-		Set [Function] = New AnonymousFunction
-		[Function].Init strParameters, strBody
-		Set [Function] = [_].WrapArguments([_].WrapFunction([Function]))
-	End Function
-
-	Public Function Lambda(ByVal strParameters, ByVal strBody) 'alias of Function
-		Set Lambda = [Function](strParameters, strBody)
+		Set [Function] = Lambda(strParameters, strBody, "", Empty)
 	End Function
 
 	Public Sub Assert(ByVal boolCondition, ByVal strSource, ByVal strDescription)
@@ -127,14 +130,20 @@ Class Brackets
 		Filter = arrFiltered
 	End Function
 
-	Public Function Accumulate(varFunction, varSet, varInitialValue)
-
+	Public Function Accumulate(ByVal varFunction, ByRef varSet, ByRef varInitialValue)
+		[Set] Accumulate, varInitialValue
+		Dim varItem
+		For Each varItem In varSet
+			[Set] Accumulate, varFunction(Accumulate, varItem)
+		Next
 	End Function
 
-	Public Function Reduce()
+	Public Function Reduce(ByVal varFunction, ByRef varSet, ByRef varInitialValue)
+		' Same as Accumulate(), just a alias.
+		[Set] Reduce, Accumulate(varFunction, varSet, varInitialValue)
 	End Function
 
-	Public Function [GetObject](strProgID)
+	Public Function [GetObject](ByVal strProgID)
 		' If strProgID available, get it directly, else create & get it.
 		On Error Resume Next
 		Set objCOM = GetObject(, strProgID)
@@ -146,13 +155,39 @@ Class Brackets
 		End If
 		On Error Goto 0
 	End Function
+
+	Public Function Append(varSet1, varSet2)
+		Dim arrCombined(), lngPtr, varItem, varSet
+		ReDim arrCombined(1)
+		
+		lngPtr = -1
+		For Each varSet In Array(varSet1, varSet2)
+			For Each varItem In varSet
+				lngPtr = lngPtr + 1
+				ReDim Preserve arrCombined( _
+					[If](lngPtr > UBound(arrCombined), _
+						UBound(arrCombined) * 2, _
+						UBound(arrCombined)))
+				[Set] arrCombined(lngPtr), varItem
+			Next
+		Next
+
+		ReDim Preserve arrCombined(lngPtr)
+		Append = arrCombined
+	End Function
+
+	Public Function Flatten(arrNested)
+		''If IsArray(arrNested) Then
+		''	[Set] Flatten, Map("arr1, arr2", )
+
+	End Function
 End Class
 
 'lazy 
 ' current next
 
 Class AnonymousFunction
-	Public Sub [Set](ByRef varVariable, ByRef varValue)
+	Private Sub [Set](ByRef varVariable, ByRef varValue)
 		If IsObject(varValue) Then
 			Set varVariable = varValue
 		Else
@@ -161,29 +196,58 @@ Class AnonymousFunction
 	End Sub
 
 	Private varReturnValue
-	Private Sub Return(varValue)
+	Private Sub Return(ByRef varValue)
 		[Set] varReturnValue, varValue
 	End Sub
 	Public Property Get ReturnValue()
 		[Set] ReturnValue, varReturnValue
 	End Property
 
-	Private strCodeBody
-	Public Sub Init(strParameters, strBody)
-		Dim lngParameterCounter, strParameter
+	Private strCodeBody, arrSavedBindings
+	Public Sub Init(ByVal strParameters, ByVal strBody, ByVal strBindings, ByRef arrBindings)
+		Dim lngCounter, varItem
+
 		strCodeBody = ""
-		lngParameterCounter = 0
-		For Each strParameter in Split(Replace(strParameters, " ", ""), ",")
+		lngCounter = 0
+		For Each varItem In Split(strParameters, ",")
 			strCodeBody = strCodeBody & _
-				"Dim " & strParameter & vbNewLine & _
-				"[Set] " & strParameter & ", " & _
-				"objArguments.[" & lngParameterCounter & "]" & vbNewLine
-			lngParameterCounter = lngParameterCounter + 1
+				"Dim " & varItem & vbNewLine & _
+				"[Set] " & varItem & ", " & _
+				"objArguments.[" & CStr(lngCounter) & "]" & vbNewLine
+			lngCounter = lngCounter + 1
+		Next
+
+		strCodeBody = strCodeBody & _
+			"Dim Arguments()" & vbNewLine & _
+			"ReDim Arguments(objArguments.length - 1)" & vbNewLine & _
+			"Dim ArgumentsCount" & vbNewLine & _
+			"For ArgumentsCount = 0 To UBound(Arguments)" & vbNewLine & _
+			"	[Set] Arguments(ArgumentsCount), _" & vbNewLine & _
+			"		EVal(""objArguments.["" & CStr(ArgumentsCount) & ""]"")" & vbNewLine & _
+			"Next" & vbNewLine & _
+			"ArgumentsCount = objArguments.length" & vbNewLine
+
+		arrSavedBindings = arrBindings
+		lngCounter = -1
+		For Each varItem In Split(strBindings, ",")
+			lngCounter = lngCounter + 1
+			strCodeBody = strCodeBody & _
+				"Dim " & varItem & vbNewLine & _
+				"[Set] " & varItem & ", " & _
+				"arrSavedBindings(" & CStr(lngCounter) & ")" & vbNewLine
 		Next
 		strCodeBody = strCodeBody & strBody
 	End Sub
 
-	Public Sub Apply(objArguments)
+	Public Sub Apply(ByRef objArguments, ByRef Callee)
+		' Useful Keywords:
+		' ArgumentsCount, Arguments,
+		' Callee, Return, Exit Function
+
+		' Other Binded Keywords:
+		' objArguments, strCodeBody, arrSavedBindings,
+		' varReturnValue, Set, ReturnValue, Apply
+
 		Execute strCodeBody
 	End Sub
 End Class

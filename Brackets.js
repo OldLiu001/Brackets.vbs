@@ -1,7 +1,13 @@
 var _ = {
 	WrapFunction : function (objAnonymousFunction) {
 		return function (objArguments) {
-			objAnonymousFunction.Apply(objArguments);
+			objAnonymousFunction.Apply(
+				objArguments,
+				function () { //support anonymous function's recursion
+					objAnonymousFunction.Apply(arguments, arguments.callee);
+					return objAnonymousFunction.ReturnValue;
+				}
+			);
 			return objAnonymousFunction.ReturnValue;
 		};
 	},
