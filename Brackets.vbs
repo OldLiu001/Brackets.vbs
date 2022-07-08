@@ -1,7 +1,7 @@
 Option Explicit
 
 Class Brackets
-	Public Sub [Set](ByRef varVariable, ByRef varValue)
+	Public Sub [Set](ByRef varVariable, varValue)
 		' Unify the way of assignment in VBScript.
 		If IsObject(varValue) Then
 			Set varVariable = varValue
@@ -10,9 +10,10 @@ Class Brackets
 		End If
 	End Sub
 
-	Public Function [If](ByVal boolCondition, ByRef varTrue, ByRef varFalse)
+	Public Function [If](boolCondition, varTrue, varFalse)
 		' Just like ternary operator in other languages.
 		' But no short-circuit, all arguments will be evaluated.
+
 		If boolCondition Then
 			[Set] [If], varTrue
 		Else
@@ -20,35 +21,35 @@ Class Brackets
 		End If
 	End Function
 
-	Public Function Lambda(ByVal strParameters, ByVal strBody, ByVal strBindings, ByRef arrBindings)
+	Public Function Lambda(strParameters, strBody, strBindings, arrBindings)
 		' Argument "strParameters" & "strBind" doesn't support prefix "ByRef" & "ByVal".
-		' Keyword "Return" will help you save return value, but It will not halt the running of Lambda.
-		' You can add "Exit Function" after Return to force Lambda halt and return.
-		' Wherever you want to halt Lambda, use "Exit Function".
+		' You can think of it as always "ByVal".
+		' Keyword "Return" means save the return value, It will not really return.
+		' Do not use "Exit Function" in Lambda, it will cause some unexpectable problem.
 
 		Set Lambda = New AnonymousFunction
 		Lambda.Init strParameters, strBody, strBindings, arrBindings
 		Set Lambda = [_].WrapArguments([_].WrapFunction(Lambda))
 	End Function
 
-	Public Function [Function](ByVal strParameters, ByVal strBody)
+	Public Function [Function](strParameters, strBody)
 		' A restricted anonymous function generator.
 		' The function it generates can only refer to the arguments & built-in functions in VBScript.
 
 		Set [Function] = Lambda(strParameters, strBody, "", Empty)
 	End Function
 
-	Public Sub Assert(ByVal boolCondition, ByVal strSource, ByVal strDescription)
+	Public Sub Assert(boolCondition, strSource, strDescription)
 		If Not boolCondition Then
 			Err.Raise vbObjectError, strSource, strDescription
 		End If
 	End Sub
 
-	Public Function Range(ByVal numStart, ByVal numStop, ByVal numStep)
-		' Range(1,2,1) -> Array(1,2)
-		' Range(1,2,2) -> Array(1)
-		' Range(1,2,0) -> Error
-		' Range(1,2,-1) -> Array()
+	Public Function Range(numStart, numStop, numStep)
+		' Range(1,3,1) -> Array(1,2,3)
+		' Range(1,3,9) -> Array(1)
+		' Range(1,3,0) -> Error
+		' Range(1,3,-1) -> Array()
 
 		Assert numStep <> 0, "<Function> Range", "Step length must not be zero."
 		
@@ -67,7 +68,7 @@ Class Brackets
 		End If
 	End Function
 
-	Public Function Map(ByVal varFunction, ByRef varSet)
+	Public Function Map(varFunction, varSet)
 		' Func, Array(item1,item2,...) -> Array(Func(item1),Func(item2),...)
 
 		Dim arrMap(), varItem, lngPointer
@@ -84,7 +85,7 @@ Class Brackets
 		Map = arrMap
 	End Function
 
-	Public Sub ForEach(ByVal varSubprogram, ByRef varSet)
+	Public Sub ForEach(varSubprogram, varSet)
 		' A special Map which don't need return value.
 		' So there has a simpler but slower implement:
 		' Map varSubprogram, varSet
@@ -95,12 +96,12 @@ Class Brackets
 		Next
 	End Sub
 
-	Public Function Apply(ByVal varFunction, ByRef varArguments)
+	Public Function Apply(varFunction, varArguments)
 		' Support only Anonymous Function
 		[Set] Apply, [_].Apply(varFunction, CArray(varArguments))
 	End Function
 
-	Public Function CArray(ByRef varSet) 'Set & Array -> Array
+	Public Function CArray(varSet) 'Set & Array -> Array
 		' A simpler & slower implement:
 		' CArray = Map([Function]("x", "Return x"), varSet)
 
@@ -112,7 +113,7 @@ Class Brackets
 		End If
 	End Function
 
-	Public Function Filter(ByVal varFunction, ByRef varSet)
+	Public Function Filter(varFunction, varSet)
 		Dim lngPointer, arrFiltered(), varItem
 		ReDim arrFiltered(1)
 		lngPointer = -1
@@ -130,7 +131,7 @@ Class Brackets
 		Filter = arrFiltered
 	End Function
 
-	Public Function Accumulate(ByVal varFunction, ByRef varSet, ByRef varInitialValue)
+	Public Function Accumulate(varFunction, varSet, varInitialValue)
 		[Set] Accumulate, varInitialValue
 		Dim varItem
 		For Each varItem In varSet
@@ -138,12 +139,12 @@ Class Brackets
 		Next
 	End Function
 
-	Public Function Reduce(ByVal varFunction, ByRef varSet, ByRef varInitialValue)
+	Public Function Reduce(varFunction, varSet, varInitialValue)
 		' Same as Accumulate(), just a alias.
 		[Set] Reduce, Accumulate(varFunction, varSet, varInitialValue)
 	End Function
 
-	Public Function [GetObject](ByVal strProgID)
+	Public Function [GetObject](strProgID)
 		' If strProgID available, get it directly, else create & get it.
 		On Error Resume Next
 		Set objCOM = GetObject(, strProgID)
@@ -177,17 +178,51 @@ Class Brackets
 	End Function
 
 	Public Function Flatten(arrNested)
-		''If IsArray(arrNested) Then
-		''	[Set] Flatten, Map("arr1, arr2", )
-
+		If IsArray(arrNested) Then
+			Flatten = Array()
+			Dim varItem
+			For Each varItem In arrNested
+				Flatten = Append(Flatten, Flatten(varItem))
+			Next
+		Else
+			Flatten = Array(arrNested)
+		End If
 	End Function
+
+	Public Sub Unless(boolPredicate, varSubprogram)
+		If Not boolPredicate Then
+			Call varSubprogram()
+		End If
+	End Sub
+
+	Public Sub Times(varSubprogram, lngTimes)
+		Dim lngCounter
+		For lngCounter = 1 To lngTimes
+			Call varSubprogram()
+		Next
+	End Sub
+
+	Public Function Every(arrArguments, varFunction)
+		Every = Accumulate( _
+			[Function]("boolLeft, boolRight", "Return boolLeft And boolRight"), _
+			Map(varFunction, arrArguments), True)
+	End Function
+
+	Public Function Some(arrArguments, varFunction)
+		Some = Accumulate( _
+			[Function]("boolLeft, boolRight", "Return boolLeft Or boolRight"), _
+			Map(varFunction, arrArguments), False)
+	End Function
+
+
+
 End Class
 
 'lazy 
 ' current next
 
 Class AnonymousFunction
-	Private Sub [Set](ByRef varVariable, ByRef varValue)
+	Private Sub [Set](ByRef varVariable, varValue)
 		If IsObject(varValue) Then
 			Set varVariable = varValue
 		Else
@@ -196,7 +231,7 @@ Class AnonymousFunction
 	End Sub
 
 	Private varReturnValue
-	Private Sub Return(ByRef varValue)
+	Private Sub Return(varValue)
 		[Set] varReturnValue, varValue
 	End Sub
 	Public Property Get ReturnValue()
@@ -204,7 +239,7 @@ Class AnonymousFunction
 	End Property
 
 	Private strCodeBody, arrSavedBindings
-	Public Sub Init(ByVal strParameters, ByVal strBody, ByVal strBindings, ByRef arrBindings)
+	Public Sub Init(strParameters, strBody, strBindings, arrBindings)
 		Dim lngCounter, varItem
 
 		strCodeBody = ""
@@ -236,17 +271,27 @@ Class AnonymousFunction
 				"[Set] " & varItem & ", " & _
 				"arrSavedBindings(" & CStr(lngCounter) & ")" & vbNewLine
 		Next
-		strCodeBody = strCodeBody & strBody
+		strCodeBody = strCodeBody & strBody & vbNewLine
+
+		lngCounter = -1
+		For Each varItem In Split(strBindings, ",")
+			lngCounter = lngCounter + 1
+			strCodeBody = strCodeBody & _
+				"[Set] arrSavedBindings(" & CStr(lngCounter) & "), " & _
+				varItem & vbNewLine
+		Next
 	End Sub
 
-	Public Sub Apply(ByRef objArguments, ByRef Callee)
+	Public Sub Apply(objArguments, Callee)
 		' Useful Keywords:
 		' ArgumentsCount, Arguments,
-		' Callee, Return, Exit Function
+		' Callee, Return
 
 		' Other Binded Keywords:
 		' objArguments, strCodeBody, arrSavedBindings,
 		' varReturnValue, Set, ReturnValue, Apply
+		
+		' Don't Use: Exit Function
 
 		Execute strCodeBody
 	End Sub

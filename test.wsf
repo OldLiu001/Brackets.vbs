@@ -18,12 +18,13 @@
 
 ''	call [].lambda("","for i = 0 to ArgumentsCount-1 : wsh.echo Arguments(i) : next","wsh",array(wsh))(1,2,3,"str",true)
 
-msgbox [].function("i","if i > 1 then : return i*callee(i-1)  : else : return 1 : end if")(6)
+''msgbox [].function("i","if i > 1 then : return i*callee(i-1)  : else : return 1 : end if")(6)
 
+	''msgbox join([].Flatten(array(1,2,array(3,array(4,5)),6,array(array(array(array(7)),8),Array(9,10))))," ")
 
+'msgbox [].apply([].function("i,j","return i+j"),array(2,5))
 
-
-
+''set z = [].lambda("","wsh.echo i:i=i+1","wsh,i",array(wsh,1))
 
 
 
