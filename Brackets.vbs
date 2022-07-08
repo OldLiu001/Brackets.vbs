@@ -3,6 +3,7 @@ Option Explicit
 Class Brackets
 	Public Sub [Set](ByRef varVariable, varValue)
 		' Unify the way of assignment in VBScript.
+
 		If IsObject(varValue) Then
 			Set varVariable = varValue
 		Else
@@ -40,6 +41,8 @@ Class Brackets
 	End Function
 
 	Public Sub Assert(boolCondition, strSource, strDescription)
+		' !boolCondition -> Error
+
 		If Not boolCondition Then
 			Err.Raise vbObjectError, strSource, strDescription
 		End If
@@ -98,6 +101,7 @@ Class Brackets
 
 	Public Function Apply(varFunction, varArguments)
 		' Support only Anonymous Function
+
 		[Set] Apply, [_].Apply(varFunction, CArray(varArguments))
 	End Function
 
@@ -141,11 +145,13 @@ Class Brackets
 
 	Public Function Reduce(varFunction, varSet, varInitialValue)
 		' Same as Accumulate(), just a alias.
+
 		[Set] Reduce, Accumulate(varFunction, varSet, varInitialValue)
 	End Function
 
 	Public Function [GetObject](strProgID)
 		' If strProgID available, get it directly, else create & get it.
+
 		On Error Resume Next
 		Set objCOM = GetObject(, strProgID)
 		If Err.Number <> 0 Then
@@ -158,6 +164,7 @@ Class Brackets
 	End Function
 
 	Public Function Append(varSet1, varSet2)
+		' Array(1,2), Array(3) -> Array(1,2,3)
 		Dim arrCombined(), lngPtr, varItem, varSet
 		ReDim arrCombined(1)
 		
@@ -231,6 +238,9 @@ Class Brackets
 	End Function
 
 	Public Function Zip(varLeft, varRight)
+		' Array(a, b, c), Array(d, e, f) ->
+		' Array(Array(a, d), Array(b, e), Array(c, f))
+
 		Dim arrLeft, arrRight
 		arrLeft = CArray(varLeft)
 		arrRight = CArray(varRight)
@@ -253,14 +263,7 @@ Class Brackets
 			Min(UBound(varLeft), UBound(varRight)))
 		Zip = arrZipped
 	End Function
-
-	''教程中实现一个支持多参的Zip
-
-	
 End Class
-
-'lazy 
-' current next
 
 Class AnonymousFunction
 	Private Sub [Set](ByRef varVariable, varValue)

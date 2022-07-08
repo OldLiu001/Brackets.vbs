@@ -17,8 +17,14 @@
 			<PARAMETER name="varTrue"/>
 			<PARAMETER name="varFalse"/>
 		</method>
-		<method name="Function" internalName="BuildAnonymousFunction">
-			<PARAMETER name="boolCondition"/>
+		<method name="Lambda">
+			<PARAMETER name="strParameters"/>
+			<PARAMETER name="strBody"/>
+			<PARAMETER name="strBindings"/>
+			<PARAMETER name="arrBindings"/>
+		</method>
+		<method name="Function" internalName="BuildFunction">
+			<PARAMETER name="strParameters"/>
 			<PARAMETER name="strBody"/>
 		</method>
 		<method name="Assert">
@@ -26,18 +32,80 @@
 			<PARAMETER name="strSource"/>
 			<PARAMETER name="strDescription"/>
 		</method>
-		<method name="ForEach">
-			<PARAMETER name="varSubprogram"/>
-			<PARAMETER name="varCollection"/>
-		</method>
 		<method name="Range">
-			<PARAMETER name="lngStart"/>
-			<PARAMETER name="lngStop"/>
-			<PARAMETER name="lngStep"/>
+			<PARAMETER name="numStart"/>
+			<PARAMETER name="numStop"/>
+			<PARAMETER name="numStep"/>
 		</method>
 		<method name="Map">
 			<PARAMETER name="varFunction"/>
-			<PARAMETER name="varCollection"/>
+			<PARAMETER name="varSet"/>
+		</method>
+		<method name="ForEach">
+			<PARAMETER name="varSubprogram"/>
+			<PARAMETER name="varSet"/>
+		</method>
+		<method name="Apply">
+			<PARAMETER name="varFunction"/>
+			<PARAMETER name="varArguments"/>
+		</method>
+		<method name="CArray">
+			<PARAMETER name="varSet"/>
+		</method>
+		<method name="Filter">
+			<PARAMETER name="varFunction"/>
+			<PARAMETER name="varSet"/>
+		</method>
+		<method name="Accumulate">
+			<PARAMETER name="varFunction"/>
+			<PARAMETER name="varSet"/>
+			<PARAMETER name="varInitialValue"/>
+		</method>
+		<method name="Reduce">
+			<PARAMETER name="varFunction"/>
+			<PARAMETER name="varSet"/>
+			<PARAMETER name="varInitialValue"/>
+		</method>
+		<method name="GetObject" internalName="GetCOMObject">
+			<PARAMETER name="strProgID"/>
+		</method>
+		<method name="Append">
+			<PARAMETER name="varSet1"/>
+			<PARAMETER name="varSet2"/>
+		</method>
+		<method name="Flatten">
+			<PARAMETER name="arrNested"/>
+		</method>
+		<method name="Unless">
+			<PARAMETER name="boolPredicate"/>
+			<PARAMETER name="varSubprogram"/>
+		</method>
+		<method name="Times">
+			<PARAMETER name="varSubprogram"/>
+			<PARAMETER name="lngTimes"/>
+		</method>
+		<method name="Every">
+			<PARAMETER name="arrArguments"/>
+			<PARAMETER name="varFunction"/>
+		</method>
+		<method name="Some">
+			<PARAMETER name="arrArguments"/>
+			<PARAMETER name="varFunction"/>
+		</method>
+		<method name="Once">
+			<PARAMETER name="varFunction"/>
+		</method>
+		<method name="Min">
+			<PARAMETER name="numA"/>
+			<PARAMETER name="numB"/>
+		</method>
+		<method name="Max">
+			<PARAMETER name="numA"/>
+			<PARAMETER name="numB"/>
+		</method>
+		<method name="Zip">
+			<PARAMETER name="varLeft"/>
+			<PARAMETER name="varRight"/>
 		</method>
 	</public>
 	<script language="JScript" src="./Brackets.js" />
@@ -48,32 +116,100 @@
 			Private []
 			Set [] = New Brackets
 
-			Public Sub [Set](ByRef varVariable, ByRef varValue)
+			Public Sub [Set](ByRef varVariable, varValue)
 				[].[Set] varVariable, varValue
 			End Sub
 
-			Public Function [If](ByVal boolCondition, ByRef varTrue, ByRef varFalse)
+			Public Function [If](boolCondition, varTrue, varFalse)
 				[Set] [If], [].If(boolCondition, varTrue, varFalse)
 			End Function
 
-			Public Function BuildAnonymousFunction(ByVal strParameters, ByVal strBody)
-				Set BuildAnonymousFunction = [].[Function](strParameters, strBody)
+			Public Function Lambda(strParameters, strBody, strBindings, arrBindings)
+				[Set] Lambda, [].Lambda(strParameters, strBody, strBindings, arrBindings)
 			End Function
 
-			Public Sub Assert(ByVal boolCondition, ByVal strSource, ByVal strDescription)
+			Public Function BuildFunction(strParameters, strBody)
+				[Set] BuildFunction, [].Function(strParameters, strBody)
+			End Function
+
+			Public Sub Assert(boolCondition, strSource, strDescription)
 				[].Assert boolCondition, strSource, strDescription
 			End Sub
 
-			Public Sub ForEach(ByVal varSubprogram, ByRef varCollection)
-				[].ForEach varSubprogram, varCollection
-			End Sub
-
-			Public Function Range(ByVal lngStart, ByVal lngStop, ByVal lngStep)
-				Range = [].Range(lngStart, lngStop, lngStep)
+			Public Function Range(numStart, numStop, numStep)
+				[Set] Range, [].Range(numStart, numStop, numStep)
 			End Function
 
-			Public Function Map(ByVal varFunction, ByRef varCollection)
-				Map = [].Map(varFunction, varCollection)
+			Public Function Map(varFunction, varSet)
+				[Set] Map, [].Map(varFunction, varSet)
+			End Function
+
+			Public Sub ForEach(ByVal varSubprogram, ByRef varSet)
+				[].ForEach varSubprogram, varSet
+			End Sub
+
+			Public Function Apply(varFunction, varArguments)
+				[Set] Apply, [].Apply(varFunction, varArguments)
+			End Function
+
+			Public Function CArray(varSet)
+				[Set] CArray, [].CArray(varSet)
+			End Function
+
+			Public Function Filter(varFunction, varSet)
+				[Set] Filter, [].Filter(varFunction, varSet)
+			End Filter
+
+			Public Function Accumulate(varFunction, varSet, varInitialValue)
+				[Set] Accumulate, [].Accumulate(varFunction, varSet, varInitialValue)
+			End Function
+
+			Public Function Reduce(varFunction, varSet, varInitialValue)
+				[Set] Reduce, [].Reduce(varFunction, varSet, varInitialValue)
+			End Function
+
+			Public Function GetCOMObject(strProgID)
+				[Set] GetCOMObject, [].GetObject(strProgID)
+			End Function
+			
+			Public Function Append(varSet1, varSet2)
+				[Set] Append, [].Append(varSet1, varSet2)
+			End Function
+
+			Public Function Flatten(arrNested)
+				[Set] Flatten, [].Flatten(arrNested)
+			End Function
+
+			Public Sub Unless(boolPredicate, varSubprogram)
+				[].Unless boolPredicate, varSubprogram
+			End Sub
+
+			Public Sub Times(varSubprogram, lngTimes)
+				[].Times varSubprogram, lngTimes
+			End Sub
+
+			Public Function Every(arrArguments, varFunction)
+				[Set] Every, [].Every(arrArguments, varFunction)
+			End Function
+
+			Public Function Some(arrArguments, varFunction)
+				[Set] Some, [].Some(arrArguments, varFunction)
+			End Function
+
+			Public Function Once(varFunction)
+				[Set] Once, [].Once(varFunction)
+			End Function
+
+			Public Function Min(numA, numB)
+				[Set] Min, [].Min(numA, numB)
+			End Function
+
+			Public Function Max(numA, numB)
+				[Set] Max, [].Max(numA, numB)
+			End Function
+
+			Public Function Zip(varLeft, varRight)
+				[Set] Zip, [].Zip(varLeft, varRight)
 			End Function
 		]]>
 	</script>
