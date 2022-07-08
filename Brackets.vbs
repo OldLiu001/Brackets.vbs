@@ -25,7 +25,7 @@ Class Brackets
 		' Argument "strParameters" & "strBind" doesn't support prefix "ByRef" & "ByVal".
 		' You can think of it as always "ByVal".
 		' Keyword "Return" means save the return value, It will not really return.
-		' Do not use "Exit Function" in Lambda, it will cause some unexpectable problem.
+		' Do not use "Exit Function" in Lambda, it will cause bindings save to fail.
 
 		Set Lambda = New AnonymousFunction
 		Lambda.Init strParameters, strBody, strBindings, arrBindings
@@ -214,8 +214,49 @@ Class Brackets
 			Map(varFunction, arrArguments), False)
 	End Function
 
+	Public Function Once(varFunction)
+		Set Once = Lambda( _
+			"", _
+			"If boolFirst Then [_].Apply varFunction, Arguments : boolFirst = False", _
+			"boolFirst, [_], varFunction", _
+			Array(True, [_], varFunction))
+	End Function
 
+	Public Function Min(numA, numB)
+		Min = [If](numA < numB, numA, numB)
+	End Function
 
+	Public Function Max(numA, numB)
+		Max = [If](numA > numB, numA, numB)
+	End Function
+
+	Public Function Zip(varLeft, varRight)
+		Dim arrLeft, arrRight
+		arrLeft = CArray(varLeft)
+		arrRight = CArray(varRight)
+
+		Dim lngPtr
+		Dim arrZipped()
+		ReDim arrZipped(1)
+		For lngPtr = _
+			0 To Min(UBound(varLeft), UBound(varRight))
+			ReDim Preserve arrZipped( _
+				[If](lngPtr > UBound(arrZipped), _
+					UBound(arrZipped) * 2, _
+					UBound(arrZipped)))
+			arrZipped(lngPtr) = Append( _
+				Array(varLeft(lngPtr)), _
+				Array(varRight(lngPtr)))
+		Next
+
+		ReDim Preserve arrZipped( _
+			Min(UBound(varLeft), UBound(varRight)))
+		Zip = arrZipped
+	End Function
+
+	''教程中实现一个支持多参的Zip
+
+	
 End Class
 
 'lazy 

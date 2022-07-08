@@ -25,9 +25,17 @@
 'msgbox [].apply([].function("i,j","return i+j"),array(2,5))
 
 ''set z = [].lambda("","wsh.echo i:i=i+1","wsh,i",array(wsh,1))
+''[].Times  z,7
 
+''msgbox join([].filter([].function("n","return n<>false"),[].map([].lambda("n","return [].if([].every([].range(2,n-1,1), [].lambda(""i"",""return n mod i<>0"",""n"",array(n))),n,false)","[]",array([])),[].range(2,100,1))), " ")
 
+''set s = [].Once([].lambda("i","wsh.echo i","wsh",array(wsh)))
+''s "hello"
+''s "hello2"
+''s "hello3"
 
+''wsh.echo array(array(1,2,3),array(4,5,6))(1)(0)
+''wsh.echo [].zip(array(1,2,3),array(4,5,6))(1)(0)
 
 	</script>
 </job>
