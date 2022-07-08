@@ -105,7 +105,19 @@ Hungarian notation: *lng* **Long**, *str* **String**, *obj* **Object**, *arr* **
 
 # Examples(TODO)
 
+# Contribute
+
+Welcome!
+
+Remember obey the Hungarian naming rule. Keep your code clear & meaningful.
+
+Then simply open your pull request!
+
 # See Also
+
+- [SICP Book](https://mitpress.mit.edu/sites/default/files/sicp/index.html)
+
+- [Python](https://www.python.org/)
 
 - [underscore.js](https://github.com/jashkenas/underscore)
 

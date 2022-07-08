@@ -102,7 +102,19 @@ apply只接收匿名函数。
 
 # 示例(TODO)
 
+# 贡献
+
+欢迎贡献代码！
+
+代码中的变量须遵守匈牙利命名规则。确保您的代码简洁明了。
+
+然后提交 *Pull Request* 即可！
+
 # 参照
+
+- [SICP Book](https://mitpress.mit.edu/sites/default/files/sicp/index.html)
+
+- [Python](https://www.python.org/)
 
 - [underscore.js](https://github.com/jashkenas/underscore)
 
@@ -111,4 +123,3 @@ apply只接收匿名函数。
 - [lazy.js](https://github.com/dtao/lazy.js)
 
 - [ramda.js](https://ramdajs.com/)
-
