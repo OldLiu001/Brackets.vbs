@@ -8,11 +8,18 @@
     \_______\/ \_\/ \_\/ \__\/\__\/ \_____\/ \__\/\__\/  \_____\/   \__\/    \_____\/
 ```
 
-A powerful, portable COM component written in *VBScript* to control Windows Terminal.
+A powerful, elegent & lightweight Functional Programming library for *VBScript*, overturn your understanding of programming in *VBScript*.
 
-*JScript* is also available for use with this component.
+The first anonymous function support for *VBScript*, add your environment on demand.
 
-Include color output, cursor control, and so on.
+Dozens of common, general and easy-to-use methods are also provided.
+
+Through the encapsulation and nesting of functions, complex problems are stripped of their cocoons to show the essence of transformation.
+
+It's just like magic! Programming and mathematics can be so similar!
+
+Enjoy the charm of functional programming!
+
 
 # View introduction in
 
@@ -105,3 +112,5 @@ Hungarian notation: *lng* **Long**, *str* **String**, *obj* **Object**, *arr* **
 - [lodash.js](https://github.com/lodash/lodash)
 
 - [lazy.js](https://github.com/dtao/lazy.js)
+
+- [ramda.js](https://ramdajs.com/)
