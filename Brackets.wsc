@@ -158,7 +158,7 @@
 
 			Public Function Filter(varFunction, varSet)
 				[Set] Filter, [].Filter(varFunction, varSet)
-			End Filter
+			End Function
 
 			Public Function Accumulate(varFunction, varSet, varInitialValue)
 				[Set] Accumulate, [].Accumulate(varFunction, varSet, varInitialValue)

@@ -1,6 +1,35 @@
 Option Explicit
 
 Class Brackets
+	Private []
+
+	Public Compose, GatherArguments
+	Private Sub Class_Initialize
+		Set [] = New Brackets
+
+		[Set] GatherArguments, Lambda("", _
+			"If IsEmpty(varFunction) Then" & vbNewLine & _
+			"	Set varFunction = Arguments(0)" & vbNewLine & _
+			"	Return Callee" & vbNewLine & _
+			"Else" & vbNewLine & _
+			"	Return varFunction(Arguments)" & vbNewLine & _
+			"End If", _
+			"varFunction", Array(Empty))
+
+		[Set] Compose, Lambda("", _
+			"If IsEmpty(arrFunctions) Then" & vbNewLine & _
+			"	arrFunctions = Arguments" & vbNewLine & _
+			"	Return Callee" & vbNewLine & _
+			"Else" & vbNewLine & _
+			"	Return [].Reduce(" & _
+			"		[].Function(" & _
+			"			""varData, varFunction"", " & _
+			"			""Return varFunction(varData)""), " & _
+			"		arrFunctions, Arguments(0))"& vbNewLine & _
+			"End If", _
+			"arrFunctions", Array(Empty))
+	End Sub
+
 	Public Sub [Set](ByRef varVariable, varValue)
 		' Unify the way of assignment in VBScript.
 
@@ -15,6 +44,7 @@ Class Brackets
 		' Just like ternary operator in other languages.
 		' But no short-circuit, all arguments will be evaluated.
 
+		' [Set] [If], Array(varTrue,varFalse)(CByte(boolCondition) + 1)
 		If boolCondition Then
 			[Set] [If], varTrue
 		Else
@@ -30,7 +60,7 @@ Class Brackets
 
 		Set Lambda = New AnonymousFunction
 		Lambda.Init strParameters, strBody, strBindings, arrBindings
-		Set Lambda = [_].WrapArguments([_].WrapFunction(Lambda))
+		Set Lambda = [_].GatherArguments(Lambda)
 	End Function
 
 	Public Function [Function](strParameters, strBody)
@@ -102,7 +132,11 @@ Class Brackets
 	Public Function Apply(varFunction, varArguments)
 		' Support only Anonymous Function
 
-		[Set] Apply, [_].Apply(varFunction, CArray(varArguments))
+		[Set] Apply, [_].SpreadArguments(varFunction, CArray(varArguments))
+	End Function
+
+	Public Function SpreadArguments(varFunction, varArguments)
+		[Set] SpreadArguments, Apply(varFunction, varArguments)
 	End Function
 
 	Public Function CArray(varSet) 'Set & Array -> Array
@@ -263,6 +297,56 @@ Class Brackets
 			Min(UBound(varLeft), UBound(varRight)))
 		Zip = arrZipped
 	End Function
+
+	Public Function Carry(varFunction, lngArgumentsCount)
+		[Set] Carry, Lambda("", _
+			"arrSavedArguments = [].Append(arrSavedArguments, Arguments)" & vbNewLine & _
+			"If UBound(arrSavedArguments) = lngArgumentsCount - 1 Then" & vbNewLine & _
+			"	Return [].Apply(varFunction, arrSavedArguments)" & vbNewLine & _
+			"Else" & vbNewLine & _
+			"	Return Callee" & vbNewLine & _
+			"End If", _
+			"[], varFunction, lngArgumentsCount, arrSavedArguments", _
+			Array([], varFunction, lngArgumentsCount, Array()))
+	End Function
+
+	Public Function Partial(varFunction, arrArguments)
+		[Set] Partial, Lambda("", _
+			"Return [].Apply(varFunction, [].Append(arrArguments, Arguments))", _
+			"[], varFunction, arrArguments", _
+			Array([], varFunction, arrArguments))
+	End Function
+
+	Public Function Reverse(varSet)
+		Dim arrSet, lngPtr, lngUpperBound
+		[Set] arrSet, CArray(varSet)
+		[Set] lngUpperBound, UBound(arrSet)
+		Dim arrReversed()
+		ReDim arrReversed(lngUpperBound)
+		For lngPtr = 0 To lngUpperBound
+			[Set] arrReversed(lngUpperBound - lngPtr), arrSet(lngPtr)
+		Next
+		[Set] Reverse, arrReversed
+	End Function
+
+	Public Function Chain
+	End Function
+
+	Public Function Value
+	End Function
+End Class
+
+Class Lazy
+
+End Class
+
+Class Stream
+	Public Current
+	Public [Next]
+End Class
+
+Class Pair
+	Public Left, Right
 End Class
 
 Class AnonymousFunction

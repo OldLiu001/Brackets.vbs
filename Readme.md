@@ -8,7 +8,7 @@
     \_______\/ \_\/ \_\/ \__\/\__\/ \_____\/ \__\/\__\/  \_____\/   \__\/    \_____\/
 ```
 
-A powerful, elegent & lightweight Functional Programming library for *VBScript*, overturn your understanding of programming in *VBScript*.
+A powerful, elegent & lightweight Functional Programming library for *VBScript*, overturn your understanding of* VBScript* programming.
 
 The first anonymous function support for *VBScript*, add your environment on demand.
 
@@ -115,7 +115,7 @@ Then simply open your pull request!
 
 # See Also
 
-- [SICP Book](https://mitpress.mit.edu/sites/default/files/sicp/index.html)
+- [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html)
 
 - [Python](https://www.python.org/)
 

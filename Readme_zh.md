@@ -112,7 +112,7 @@ apply只接收匿名函数。
 
 # 参照
 
-- [SICP Book](https://mitpress.mit.edu/sites/default/files/sicp/index.html)
+- [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html)
 
 - [Python](https://www.python.org/)
 
