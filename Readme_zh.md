@@ -215,7 +215,7 @@ Set varF3=[].Function("x", "Return x - 10")
 Msgbox [].Compose(varF1,varF2,varF3)(1)
 ```
 
-## Methods for Array
+## 数组相关方法
 
 `[].Range(numStart, numStop, numStep) -> arrNumber`
 
@@ -289,7 +289,7 @@ Msgbox Join([].Flatten(Array(1, 2, Array(3, Array(4)), Array(Array(Array(Array(5
 Msgbox Join([].Reverse(Array(1,2,3)), " ") ' -> 3 2 1
 ```
 
-## Methods for Function & Array
+## 函数结合数组相关方法
 
 `[].Map(varFunction, varSet) -> arrMapped`
 
@@ -392,7 +392,7 @@ Msgbox [].Some(Array(1, -1), [].Function("i", "Return i > 0"))
 Msgbox [].Some(Array(0, -1), [].Function("i", "Return i > 0"))
 ```
 
-## Other Methods
+## 其它方法
 
 `[].Set varVariable, varValue`
 
