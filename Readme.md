@@ -101,7 +101,7 @@ Set [] = New Brackets
 
 ## Methods for Function
 
-`*[].Function(strParameters, strBody) -> varFunction*`
+`[].Function(strParameters, strBody) -> varFunction`
 
 A restricted anonymous function generator.
 
@@ -130,9 +130,11 @@ Keyword "Return" means save the return value, It will not really return.
 Call [].Function("", "Return Empty : Msgbox ""Fake Return!""")()
 ```
 
-*[].Lambda(strParameters, strBody, strBindings, arrBindings) -> varFunction*
 
-Similar to *[].Function*, but with bindings.
+
+`[].Lambda(strParameters, strBody, strBindings, arrBindings) -> varFunction`
+
+Similar to `[].Function`, but with bindings.
 
 ```
 ' Save variable to Lambda's environment
@@ -148,7 +150,9 @@ Fibonacci() : Fibonacci() : Fibonacci() ' -> 1 1 2
 Msgbox Fibonacci() & " " & Fibonacci() & " " & Fibonacci()
 ```
 
-*[].Times varSubprogram, lngTimes*
+
+
+`[].Times varSubprogram, lngTimes`
 
 Run function many times.
 
@@ -156,7 +160,9 @@ Run function many times.
 [].Times [].Function("", "Msgbox ""Say something important three times."""), 3
 ```
 
-*[].Once(varFunction) -> varDisposableFunction*
+
+
+`[].Once(varFunction) -> varDisposableFunction`
 
 Run function just one time.
 
@@ -165,7 +171,9 @@ Set varTest = [].Once([].Function("", "Msgbox 1"))
 varTest() : varTest() : varTest()
 ```
 
-*[].Curry(varFunction, lngArgumentsCount)*
+
+
+`[].Curry(varFunction, lngArgumentsCount)`
 
 ```
 ' varFunction(a,b,c), 3 -> varFunction(a)(b)(c)
@@ -177,7 +185,9 @@ Msgbox varAdd(1)(2)(3)
 Msgbox varAdd(1)(2,3)
 ```
 
-*[].Partial(varFunction, arrArguments)*
+
+
+`[].Partial(varFunction, arrArguments)`
 
 ```
 ' varFunction(a,b,c,d) , Array(1,2) -> varFunction(1,2,c,d)
@@ -187,7 +197,9 @@ Set varAdd3 = [].Partial(varAdd, Array(1, 2))
 Msgbox varAdd3(3)
 ```
 
-*[].Compose(varFunc1, varFunc2, ...) -> varPipelineFunction*
+
+
+`[].Compose(varFunc1, varFunc2, ...) -> varPipelineFunction`
 
 ```
 ' varF3(varF2(varF1(1))) -> varPipeline(1)
@@ -200,7 +212,7 @@ Msgbox [].Compose(varF1,varF2,varF3)(1)
 
 ## Methods for Array
 
-*[].Range(numStart, numStop, numStep) -> arrNumber*
+`[].Range(numStart, numStop, numStep) -> arrNumber`
 
 ```
 ' Range(1,3,1) -> Array(1,2,3)
@@ -212,7 +224,9 @@ Msgbox [].Compose(varF1,varF2,varF3)(1)
 Msgbox [].Reduce([].Function("i, j", "Return i * j"), [].Range(1,6,1), 1)
 ```
 
-*[].CArray(varSet) -> Array(...)*
+
+
+`[].CArray(varSet) -> Array(...)`
 
 Turn Set (like FSO.Drives) to Array.
 
@@ -220,7 +234,9 @@ Turn Set (like FSO.Drives) to Array.
 Msgbox Join([].CArray(CreateObject("Scripting.FileSystemObject").Drives), " ")
 ```
 
-*[].Append(varSet1, varSet2) -> arrAppended*
+
+
+`[].Append(varSet1, varSet2) -> arrAppended`
 
 ```
 ' Array(a, b), Array(c, d) -> Array(a, b, c, d)
@@ -228,7 +244,9 @@ Msgbox Join([].CArray(CreateObject("Scripting.FileSystemObject").Drives), " ")
 Msgbox Join([].Append(Array(1, 2), Array(3, 4)))
 ```
 
-*[].Flatten(arrNested) -> arrFlattened*
+
+
+`[].Flatten(arrNested) -> arrFlattened`
 
 ```
 ' Array(a, Array(b), Array(Array(c))) -> Array(a, b, c)
@@ -236,7 +254,7 @@ Msgbox Join([].Append(Array(1, 2), Array(3, 4)))
 Msgbox Join([].Flatten(Array(1, 2, Array(3, Array(4)), Array(Array(Array(Array(5)))))), " ")
 ```
 
-*Zip(varLeft, varRight) -> arrZipped*
+`Zip(varLeft, varRight) -> arrZipped`
 
 ```
 ' Array(a, b, c), Array(d, e, f) ->
@@ -246,7 +264,9 @@ Msgbox Join([].Flatten(Array(1, 2, Array(3, Array(4)), Array(Array(Array(Array(5
 	[].Zip(Array(1, 0, -1), Array(-1, 0, 1))
 ```
 
-*[].Reverse(varSet) -> arrReversed*
+
+
+`[].Reverse(varSet) -> arrReversed`
 
 ```
 Msgbox Join([].Reverse(Array(1,2,3)), " ") ' -> 3 2 1
@@ -254,7 +274,7 @@ Msgbox Join([].Reverse(Array(1,2,3)), " ") ' -> 3 2 1
 
 ## Methods for Function & Array
 
-*[].Map(varFunction, varSet) -> arrMapped*
+`[].Map(varFunction, varSet) -> arrMapped`
 
 ```
 'Func, Array(item1,item2,...) -> Array(Func(item1),Func(item2),...)
@@ -262,15 +282,19 @@ Msgbox Join([].Reverse(Array(1,2,3)), " ") ' -> 3 2 1
 Msgbox Join([].Map([].Function("i", "Return i^2"), [].Range(0,9,1)), " ")
 ```
 
-*[].ForEach varSubprogram, varSet*
 
-Similar to *[].Map*, but without return value.
+
+`[].ForEach varSubprogram, varSet`
+
+Similar to `[].Map`, but without return value.
 
 ```
 [].ForEach [].Function("strArg", "Msgbox strArg"), [].Range(1,5,1)
 ```
 
-*[].Apply(varFunction, varArguments) -> varReturn*
+
+
+`[].Apply(varFunction, varArguments) -> varReturn`
 
 ```
 ' varFunciton, Array(a, b, c, ...) -> varFunction(a, b, c, ...)
@@ -279,11 +303,15 @@ Similar to *[].Map*, but without return value.
 Msgbox [].Apply([].Function("i, j", "Return i+j"), Array(12, 28))
 ```
 
-*[].SpreadArguments(varFunction, varArguments) -> varReturn*
 
-Same as *[].Apply*.
 
-*[].GatherArguments(varFunction, varArguments) -> varReturn*
+`[].SpreadArguments(varFunction, varArguments) -> varReturn`
+
+Same as `[].Apply`.
+
+
+
+`[].GatherArguments(varFunction, varArguments) -> varReturn`
 
 ```
 ' varFunction(a, b, c, ...) -> varFunciton(Array(a, b, c, ...))
@@ -291,7 +319,9 @@ Same as *[].Apply*.
 Msgbox [].GatherArguments([].Function("arrArg", "Return arrArg(1)"))(333, 444, 555)
 ```
 
-*[].Filter(varFunction, varSet) -> arrFiltered*
+
+
+`[].Filter(varFunction, varSet) -> arrFiltered`
 
 Leave those items which pass the test.
 
@@ -299,7 +329,9 @@ Leave those items which pass the test.
 Msgbox Join([].Filter([].Function("i", "Return i > 4"), Array(1,3,5,7)), " ")
 ```
 
-*[].Reduce(varFunction, varSet, varInitialValue) -> varReduced*
+
+
+`[].Reduce(varFunction, varSet, varInitialValue) -> varReduced`
 
 Use binary arguments function to reduce an array to a single variable.
 
@@ -309,11 +341,15 @@ Msgbox [].Reduce([].Function("i, j", "Return i Or j"), Array(True, True, False),
 Msgbox [].Reduce([].Function("i, j", "Return i And j"), Array(True, True, False), True)
 ```
 
-*[].Accumulate(varFunction, varSet, varInitialValue) -> varAccumulated*
 
-Same as *[].Reduce*.
 
-*[].Every(arrArguments, varFunction) -> boolTested*
+`[].Accumulate(varFunction, varSet, varInitialValue) -> varAccumulated`
+
+Same as `[].Reduce`.
+
+
+
+`[].Every(arrArguments, varFunction) -> boolTested`
 
 All items meet the requirements.
 
@@ -322,7 +358,9 @@ Msgbox [].Every(Array(1, 2, 3), [].Function("i", "Return i > 0"))
 Msgbox [].Every(Array(1, -1), [].Function("i", "Return i > 0"))
 ```
 
-*[].Some(arrArguments, varFunction) -> boolTested*
+
+
+`[].Some(arrArguments, varFunction) -> boolTested`
 
 Some items meet the requirements.
 
@@ -333,16 +371,18 @@ Msgbox [].Some(Array(0, -1), [].Function("i", "Return i > 0"))
 
 ## Other Methods
 
-*[].Set varVariable, varValue*
+`[].Set varVariable, varValue`
 
-Assign *varValue* to *varVariable* whether *varValue* is an object or not.
+Assign `varValue` to `varVariable` whether `varValue` is an object or not.
 
 ```
 [].Set objFS, CreateObject("Scripting.FileSystemObject")
 [].Set PI, Atn(1) * 4
 ```
 
-*[].If(boolCondition, varTrue, varFalse) -> varRet*
+
+
+`[].If(boolCondition, varTrue, varFalse) -> varRet`
 
 Just like ternary operator in other languages.
 
@@ -353,14 +393,18 @@ Msgbox [].If(2000 > 3000, "2000гд > 3000$", "2000гд <= 3000$")
 Msgbox [].If(0.1 + 0.2 = 0.3, "0.1 + 0.2 = 0.3", "0.1 + 0.2 <> 0.3")
 ```
 
-*[].Assert boolCondition, strSource, strDescription*
+
+
+`[].Assert boolCondition, strSource, strDescription`
 
 ```
 [].Assert WScript.Arguments.Count = 1, _
 	"WScript.Arguments", "Need a command-line argument."
 ```
 
-*[].GetObject(strProgID) -> objCOM*
+
+
+`[].GetObject(strProgID) -> objCOM`
 
 If strProgID available, get it directly, else create & get it.
 
@@ -368,14 +412,16 @@ If strProgID available, get it directly, else create & get it.
 [].Set objWord, [].GetObject("Word.Application")
 ```
 
-*[].Unless boolPredicate, varSubprogram*
+
+
+`[].Unless boolPredicate, varSubprogram`
 
 ```
 [].Unless True, [].Function("", "Msgbox 1")
 [].Unless False, [].Function("", "Msgbox 2")
 ```
 
-*Min(numA, numB) -> numMinimum*
+`Min(numA, numB) -> numMinimum`
 
 Return the minimum value of two arguments.
 
@@ -386,7 +432,7 @@ arrTest =  Array(1, 0, -1, -100)
 Msgbox [].Reduce([].Lambda("i, j", "Return [].Min(i, j)", "[]", Array([])), arrTest, arrTest(0))
 ```
 
-*Max(numA, numB) -> numMaximum*
+`Max(numA, numB) -> numMaximum`
 
 Return the maximum value of two arguments.
 
