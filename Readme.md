@@ -130,7 +130,7 @@ Keyword "Return" means save the return value, It will not really return.
 Call [].Function("", "Return Empty : Msgbox ""Fake Return!""")()
 ```
 
-
+---
 
 `[].Lambda(strParameters, strBody, strBindings, arrBindings) -> varFunction`
 
@@ -150,7 +150,7 @@ Fibonacci() : Fibonacci() : Fibonacci() ' -> 1 1 2
 Msgbox Fibonacci() & " " & Fibonacci() & " " & Fibonacci()
 ```
 
-
+---
 
 `[].Times varSubprogram, lngTimes`
 
@@ -160,7 +160,7 @@ Run function many times.
 [].Times [].Function("", "Msgbox ""Say something important three times."""), 3
 ```
 
-
+---
 
 `[].Once(varFunction) -> varDisposableFunction`
 
@@ -171,7 +171,7 @@ Set varTest = [].Once([].Function("", "Msgbox 1"))
 varTest() : varTest() : varTest()
 ```
 
-
+---
 
 `[].Curry(varFunction, lngArgumentsCount)`
 
@@ -185,7 +185,7 @@ Msgbox varAdd(1)(2)(3)
 Msgbox varAdd(1)(2,3)
 ```
 
-
+---
 
 `[].Partial(varFunction, arrArguments)`
 
@@ -197,7 +197,7 @@ Set varAdd3 = [].Partial(varAdd, Array(1, 2))
 Msgbox varAdd3(3)
 ```
 
-
+---
 
 `[].Compose(varFunc1, varFunc2, ...) -> varPipelineFunction`
 
@@ -224,7 +224,7 @@ Msgbox [].Compose(varF1,varF2,varF3)(1)
 Msgbox [].Reduce([].Function("i, j", "Return i * j"), [].Range(1,6,1), 1)
 ```
 
-
+---
 
 `[].CArray(varSet) -> Array(...)`
 
@@ -234,7 +234,7 @@ Turn Set (like FSO.Drives) to Array.
 Msgbox Join([].CArray(CreateObject("Scripting.FileSystemObject").Drives), " ")
 ```
 
-
+---
 
 `[].Append(varSet1, varSet2) -> arrAppended`
 
@@ -244,7 +244,7 @@ Msgbox Join([].CArray(CreateObject("Scripting.FileSystemObject").Drives), " ")
 Msgbox Join([].Append(Array(1, 2), Array(3, 4)))
 ```
 
-
+---
 
 `[].Flatten(arrNested) -> arrFlattened`
 
@@ -264,7 +264,7 @@ Msgbox Join([].Flatten(Array(1, 2, Array(3, Array(4)), Array(Array(Array(Array(5
 	[].Zip(Array(1, 0, -1), Array(-1, 0, 1))
 ```
 
-
+---
 
 `[].Reverse(varSet) -> arrReversed`
 
@@ -282,7 +282,7 @@ Msgbox Join([].Reverse(Array(1,2,3)), " ") ' -> 3 2 1
 Msgbox Join([].Map([].Function("i", "Return i^2"), [].Range(0,9,1)), " ")
 ```
 
-
+---
 
 `[].ForEach varSubprogram, varSet`
 
@@ -292,7 +292,7 @@ Similar to `[].Map`, but without return value.
 [].ForEach [].Function("strArg", "Msgbox strArg"), [].Range(1,5,1)
 ```
 
-
+---
 
 `[].Apply(varFunction, varArguments) -> varReturn`
 
@@ -303,13 +303,13 @@ Similar to `[].Map`, but without return value.
 Msgbox [].Apply([].Function("i, j", "Return i+j"), Array(12, 28))
 ```
 
-
+---
 
 `[].SpreadArguments(varFunction, varArguments) -> varReturn`
 
 Same as `[].Apply`.
 
-
+---
 
 `[].GatherArguments(varFunction, varArguments) -> varReturn`
 
@@ -319,7 +319,7 @@ Same as `[].Apply`.
 Msgbox [].GatherArguments([].Function("arrArg", "Return arrArg(1)"))(333, 444, 555)
 ```
 
-
+---
 
 `[].Filter(varFunction, varSet) -> arrFiltered`
 
@@ -329,7 +329,7 @@ Leave those items which pass the test.
 Msgbox Join([].Filter([].Function("i", "Return i > 4"), Array(1,3,5,7)), " ")
 ```
 
-
+---
 
 `[].Reduce(varFunction, varSet, varInitialValue) -> varReduced`
 
@@ -341,13 +341,13 @@ Msgbox [].Reduce([].Function("i, j", "Return i Or j"), Array(True, True, False),
 Msgbox [].Reduce([].Function("i, j", "Return i And j"), Array(True, True, False), True)
 ```
 
-
+---
 
 `[].Accumulate(varFunction, varSet, varInitialValue) -> varAccumulated`
 
 Same as `[].Reduce`.
 
-
+---
 
 `[].Every(arrArguments, varFunction) -> boolTested`
 
@@ -358,7 +358,7 @@ Msgbox [].Every(Array(1, 2, 3), [].Function("i", "Return i > 0"))
 Msgbox [].Every(Array(1, -1), [].Function("i", "Return i > 0"))
 ```
 
-
+---
 
 `[].Some(arrArguments, varFunction) -> boolTested`
 
@@ -380,7 +380,7 @@ Assign `varValue` to `varVariable` whether `varValue` is an object or not.
 [].Set PI, Atn(1) * 4
 ```
 
-
+---
 
 `[].If(boolCondition, varTrue, varFalse) -> varRet`
 
@@ -393,7 +393,7 @@ Msgbox [].If(2000 > 3000, "2000гд > 3000$", "2000гд <= 3000$")
 Msgbox [].If(0.1 + 0.2 = 0.3, "0.1 + 0.2 = 0.3", "0.1 + 0.2 <> 0.3")
 ```
 
-
+---
 
 `[].Assert boolCondition, strSource, strDescription`
 
@@ -402,7 +402,7 @@ Msgbox [].If(0.1 + 0.2 = 0.3, "0.1 + 0.2 = 0.3", "0.1 + 0.2 <> 0.3")
 	"WScript.Arguments", "Need a command-line argument."
 ```
 
-
+---
 
 `[].GetObject(strProgID) -> objCOM`
 
@@ -412,7 +412,7 @@ If strProgID available, get it directly, else create & get it.
 [].Set objWord, [].GetObject("Word.Application")
 ```
 
-
+---
 
 `[].Unless boolPredicate, varSubprogram`
 
