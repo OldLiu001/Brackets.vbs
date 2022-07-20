@@ -49,6 +49,10 @@
 			<PARAMETER name="varFunction"/>
 			<PARAMETER name="varArguments"/>
 		</method>
+		<method name="SpreadArguments">
+			<PARAMETER name="varFunction"/>
+			<PARAMETER name="varArguments"/>
+		</method>
 		<method name="CArray">
 			<PARAMETER name="varSet"/>
 		</method>
@@ -107,6 +111,21 @@
 			<PARAMETER name="varLeft"/>
 			<PARAMETER name="varRight"/>
 		</method>
+		<method name="Curry">
+			<PARAMETER name="varFunction"/>
+			<PARAMETER name="lngArgumentsCount"/>
+		</method>
+		<method name="Partial">
+			<PARAMETER name="varFunction"/>
+			<PARAMETER name="arrArguments"/>
+		</method>
+		<method name="Reverse">
+			<PARAMETER name="varSet"/>
+		</method>
+		<method name="GatherArguments">
+		</method>
+		<method name="Compose">
+		</method>
 	</public>
 	<script language="JScript" src="./Brackets.js" />
 	<script language="VBScript" src="./Brackets.vbs" />
@@ -150,6 +169,10 @@
 
 			Public Function Apply(varFunction, varArguments)
 				[Set] Apply, [].Apply(varFunction, varArguments)
+			End Function
+
+			Public Function SpreadArguments(varFunction, varArguments)
+				[Set] SpreadArguments, [].SpreadArguments(varFunction, varArguments)
 			End Function
 
 			Public Function CArray(varSet)
@@ -211,6 +234,24 @@
 			Public Function Zip(varLeft, varRight)
 				[Set] Zip, [].Zip(varLeft, varRight)
 			End Function
+
+			Public Function Curry(varFunction, lngArgumentsCount)
+				[Set] Curry, [].Curry(varFunction, lngArgumentsCount)
+			End Function
+
+			Public Function Partial(varFunction, arrArguments)
+				[Set] Partial, [].Partial(varFunction, arrArguments)
+			End Function
+
+			Public Function Reverse(varSet)
+				[Set] Reverse, [].Reverse(varSet)
+			End Function
+
+			Dim GatherArguments
+			[Set] GatherArguments, [].GatherArguments
+
+			Dim Compose
+			[Set] Compose, [].Compose
 		]]>
 	</script>
 </component>

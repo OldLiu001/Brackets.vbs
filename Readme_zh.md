@@ -91,7 +91,7 @@ Set [] = CreateObject("Brackets")
 Set [] = New Brackets
 ```
 
-## 用法(TODO)
+## 用法
 
 注意：在VBS中没有短路求值原则，所有的参数都将被求值
 apply只接收匿名函数。

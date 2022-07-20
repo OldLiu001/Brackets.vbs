@@ -7,6 +7,7 @@ Class Brackets
 	Private Sub Class_Initialize
 		Set [] = New Brackets
 
+		' varFunction(a, b, c, ...) -> varFunciton(Array(a, b, c, ...))
 		[Set] GatherArguments, Lambda("", _
 			"If IsEmpty(varFunction) Then" & vbNewLine & _
 			"	Set varFunction = Arguments(0)" & vbNewLine & _
@@ -44,19 +45,13 @@ Class Brackets
 		' Just like ternary operator in other languages.
 		' But no short-circuit, all arguments will be evaluated.
 
-		' [Set] [If], Array(varTrue,varFalse)(CByte(boolCondition) + 1)
-		If boolCondition Then
-			[Set] [If], varTrue
-		Else
-			[Set] [If], varFalse
-		End If
+		[Set] [If], Array(varTrue,varFalse)((boolCondition) + 1)
 	End Function
 
 	Public Function Lambda(strParameters, strBody, strBindings, arrBindings)
-		' Argument "strParameters" & "strBind" doesn't support prefix "ByRef" & "ByVal".
+		' Argument "strParameters" & "strBindings" doesn't support prefix "ByRef" & "ByVal".
 		' You can think of it as always "ByVal".
 		' Keyword "Return" means save the return value, It will not really return.
-		' Do not use "Exit Function" in Lambda, it will cause bindings save to fail.
 
 		Set Lambda = New AnonymousFunction
 		Lambda.Init strParameters, strBody, strBindings, arrBindings
@@ -130,6 +125,7 @@ Class Brackets
 	End Sub
 
 	Public Function Apply(varFunction, varArguments)
+		' varFunciton, Array(a, b, c, ...) -> varFunction(a, b, c, ...)
 		' Support only Anonymous Function
 
 		[Set] Apply, [_].SpreadArguments(varFunction, CArray(varArguments))
@@ -258,9 +254,9 @@ Class Brackets
 	Public Function Once(varFunction)
 		Set Once = Lambda( _
 			"", _
-			"If boolFirst Then [_].Apply varFunction, Arguments : boolFirst = False", _
-			"boolFirst, [_], varFunction", _
-			Array(True, [_], varFunction))
+			"If boolFirst Then [].Apply varFunction, Arguments : boolFirst = False", _
+			"boolFirst, [], varFunction", _
+			Array(True, [], varFunction))
 	End Function
 
 	Public Function Min(numA, numB)
@@ -298,8 +294,8 @@ Class Brackets
 		Zip = arrZipped
 	End Function
 
-	Public Function Carry(varFunction, lngArgumentsCount)
-		[Set] Carry, Lambda("", _
+	Public Function Curry(varFunction, lngArgumentsCount)
+		[Set] Curry, Lambda("", _
 			"arrSavedArguments = [].Append(arrSavedArguments, Arguments)" & vbNewLine & _
 			"If UBound(arrSavedArguments) = lngArgumentsCount - 1 Then" & vbNewLine & _
 			"	Return [].Apply(varFunction, arrSavedArguments)" & vbNewLine & _
@@ -337,7 +333,6 @@ Class Brackets
 End Class
 
 Class Lazy
-
 End Class
 
 Class Stream
