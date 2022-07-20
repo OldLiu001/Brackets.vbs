@@ -91,12 +91,388 @@ Set [] = CreateObject("Brackets")
 Set [] = New Brackets
 ```
 
-## 用法
+# 用法
 
-注意：在VBS中没有短路求值原则，所有的参数都将被求值
-apply只接收匿名函数。
+## 函数相关方法
 
-# 参考(TODO)
+`[].Function(strParameters, strBody) -> varFunction`
+
+受限的匿名函数生成器。
+
+它生成的函数只能引用参数和 VBScript 中的内置函数。
+
+```
+' 赋值给变量
+Set IsBigger = [].Function("i, j", "Return i > j")
+Msgbox IsBigger(2001, 1228)
+
+' 递归
+Set Factorial = [].Function("i", "If i > 1 Then : Return i * Callee(i - 1) : Else : Return 1 : End If")
+Msgbox Factorial(6)
+
+' 变长参数
+Msgbox [].Function("", "Return ArgumentsCount")(2001, 1228)
+Msgbox [].Function("", "Return Arguments(0) + Arguments(1)")(2001, 1228)
+Msgbox [].Function("", "Return Join(Arguments, "" "")")(2001, 1228)
+```
+
+参数 `strParameters` 不支持前缀 `ByRef` 以及 `ByVal`。你可以把它想象成永远 `ByVal`。
+
+关键字 `Return` 表示保存返回值，它不会真正返回。
+
+```
+Call [].Function("", "Return Empty : Msgbox ""Fake Return!""")()
+```
+
+---
+
+`[].Lambda(strParameters, strBody, strBindings, arrBindings) -> varFunction`
+
+与 `[].Function` 类似，但可以绑定环境。
+
+```
+' 给Lambda绑定环境
+Set Echo = [].Lambda("strArg", "WSH.Echo strArg", "WSH", Array(WScript))
+Echo "Hello, world!"
+
+' 修改绑定的变量
+
+Set Counter = [].Lambda("", "Return i : i = i + 1", "i", Array(0))
+Msgbox Counter() & " " & Counter() & " " & Counter()
+
+Set Fibonacci = [].Lambda("", "Return i + j : i = i + j : j = i - j", "i, j", Array(0,1))
+Fibonacci() : Fibonacci() : Fibonacci() ' -> 1 1 2
+Msgbox Fibonacci() & " " & Fibonacci() & " " & Fibonacci()
+```
+
+---
+
+`[].Times varSubprogram, lngTimes`
+
+运行过程若干次。
+
+```
+[].Times [].Function("", "Msgbox ""Say something important three times."""), 3
+```
+
+---
+
+`[].Once(varFunction) -> varDisposableFunction`
+
+将函数包裹为只可运行一次。
+
+```
+Set varTest = [].Once([].Function("", "Msgbox 1"))
+varTest() : varTest() : varTest()
+```
+
+---
+
+`[].Curry(varFunction, lngArgumentsCount)`
+
+打散参数以支持携带部分参数。
+
+这个过程一般被称作“柯里化”。
+
+```
+' varFunction(a,b,c), 3 -> varFunction(a)(b)(c)
+
+Set varAdd = [].Curry([].Function("a, b, c","Return a + b + c"), 3)
+Msgbox varAdd(1,2,3)
+Msgbox varAdd(1,2)(3)
+Msgbox varAdd(1)(2)(3)
+Msgbox varAdd(1)(2,3)
+```
+
+---
+
+`[].Partial(varFunction, arrArguments)`
+
+返回携带左半部分参数的函数。
+
+这个过程一般被称作“偏应用”。
+
+```
+' varFunction(a,b,c,d) , Array(1,2) -> varFunction(1,2,c,d)
+
+Set varAdd = [].Function("a, b, c","Return a + b + c")
+Set varAdd3 = [].Partial(varAdd, Array(1, 2))
+Msgbox varAdd3(3)
+```
+
+---
+
+`[].Compose(varFunc1, varFunc2, ...) -> varPipelineFunction`
+
+将若干单参函数打包成流水线函数。
+
+```
+' varF3(varF2(varF1(1))) -> varPipeline(1)
+
+Set varF1=[].Function("x", "Return x + 10")
+Set varF2=[].Function("x", "Return x * 10")
+Set varF3=[].Function("x", "Return x - 10")
+Msgbox [].Compose(varF1,varF2,varF3)(1)
+```
+
+## Methods for Array
+
+`[].Range(numStart, numStop, numStep) -> arrNumber`
+
+返回由若干有序、离散、等距的数组成的数组。
+
+```
+' Range(1,3,1) -> Array(1,2,3)
+' Range(1,3,2) -> Array(1,3)
+' Range(1,3,3) -> Array(1)
+' Range(1,3,0) -> Error
+' Range(1,3,-1) -> Array()
+
+Msgbox [].Reduce([].Function("i, j", "Return i * j"), [].Range(1,6,1), 1)
+```
+
+---
+
+`[].CArray(varSet) -> Array(...)`
+
+将类似 `FSO.Drives` 的集合转换成数组。
+
+```
+Msgbox Join([].CArray(CreateObject("Scripting.FileSystemObject").Drives), " ")
+```
+
+---
+
+`[].Append(varSet1, varSet2) -> arrAppended`
+
+合并两个数组/集合。
+
+```
+' Array(a, b), Array(c, d) -> Array(a, b, c, d)
+
+Msgbox Join([].Append(Array(1, 2), Array(3, 4)))
+```
+
+---
+
+`[].Flatten(arrNested) -> arrFlattened`
+
+将数组打平。
+
+```
+' Array(a, Array(b), Array(Array(c))) -> Array(a, b, c)
+
+Msgbox Join([].Flatten(Array(1, 2, Array(3, Array(4)), Array(Array(Array(Array(5)))))), " ")
+```
+
+---
+
+`[].Zip(varLeft, varRight) -> arrZipped`
+
+将两个数组/集合内对应元素打包。
+
+```
+' Array(a, b, c), Array(d, e, f) ->
+' Array(Array(a, d), Array(b, e), Array(c, f))
+
+[].ForEach [].Function("arrArg", "Msgbox arrArg(0) + arrArg(1)"),
+	[].Zip(Array(1, 0, -1), Array(-1, 0, 1))
+```
+
+---
+
+`[].Reverse(varSet) -> arrReversed`
+
+返回逆序后的数组。
+
+```
+Msgbox Join([].Reverse(Array(1,2,3)), " ") ' -> 3 2 1
+```
+
+## Methods for Function & Array
+
+`[].Map(varFunction, varSet) -> arrMapped`
+
+将象按顺序打包。
+
+```
+'Func, Array(item1,item2,...) -> Array(Func(item1),Func(item2),...)
+
+Msgbox Join([].Map([].Function("i", "Return i^2"), [].Range(0,9,1)), " ")
+```
+
+---
+
+`[].ForEach varSubprogram, varSet`
+
+与 `[].Map` 类似，但不返回值。
+
+```
+[].ForEach [].Function("strArg", "Msgbox strArg"), [].Range(1,5,1)
+```
+
+---
+
+`[].Apply(varFunction, varArguments) -> varReturn`
+
+数组元素作为函数参数调用函数。
+
+```
+' varFunciton, Array(a, b, c, ...) -> varFunction(a, b, c, ...)
+
+' Msgbox [].Function("i, j", "Return i+j")(12, 28)
+Msgbox [].Apply([].Function("i, j", "Return i+j"), Array(12, 28))
+```
+
+---
+
+`[].SpreadArguments(varFunction, varArguments) -> varReturn`
+
+与 `[].Apply` 同。
+
+---
+
+`[].GatherArguments(varFunction, varArguments) -> varReturn`
+
+将外层函数参数打包成数组传递给内层函数。
+
+```
+' varFunction(a, b, c, ...) -> varFunciton(Array(a, b, c, ...))
+
+Msgbox [].GatherArguments([].Function("arrArg", "Return arrArg(1)"))(333, 444, 555)
+```
+
+---
+
+`[].Filter(varFunction, varSet) -> arrFiltered`
+
+将满足条件的数组内元素留下。
+
+```
+Msgbox Join([].Filter([].Function("i", "Return i > 4"), Array(1,3,5,7)), " ")
+```
+
+---
+
+`[].Reduce(varFunction, varSet, varInitialValue) -> varReduced`
+
+使用二元函数归约/累积数组至一个值。
+
+```
+Msgbox [].Reduce([].Function("i, j", "Return i * j"), [].Range(1,6,1), 1)
+Msgbox [].Reduce([].Function("i, j", "Return i Or j"), Array(True, True, False), False)
+Msgbox [].Reduce([].Function("i, j", "Return i And j"), Array(True, True, False), True)
+```
+
+---
+
+`[].Accumulate(varFunction, varSet, varInitialValue) -> varAccumulated`
+
+与 `[].Reduce` 同。
+
+---
+
+`[].Every(arrArguments, varFunction) -> boolTested`
+
+判断是否所有宿主内的元素满足要求。
+
+```
+Msgbox [].Every(Array(1, 2, 3), [].Function("i", "Return i > 0"))
+Msgbox [].Every(Array(1, -1), [].Function("i", "Return i > 0"))
+```
+
+---
+
+`[].Some(arrArguments, varFunction) -> boolTested`
+
+判断是否有宿主内的元素满足要求。
+
+```
+Msgbox [].Some(Array(1, -1), [].Function("i", "Return i > 0"))
+Msgbox [].Some(Array(0, -1), [].Function("i", "Return i > 0"))
+```
+
+## Other Methods
+
+`[].Set varVariable, varValue`
+
+统一 *VBS* 内的赋值方式。
+
+```
+[].Set objFS, CreateObject("Scripting.FileSystemObject")
+[].Set PI, Atn(1) * 4
+```
+
+---
+
+`[].If(boolCondition, varTrue, varFalse) -> varRet`
+
+类似其它语言中的三目运算符，但没有短路求值。
+
+```	
+Msgbox [].If(2000 > 3000, "2000￥ > 3000$", "2000￥ <= 3000$")
+Msgbox [].If(0.1 + 0.2 = 0.3, "0.1 + 0.2 = 0.3", "0.1 + 0.2 <> 0.3")
+```
+
+---
+
+`[].Assert boolCondition, strSource, strDescription`
+
+断言条件满足，否则报错。
+
+```
+[].Assert WScript.Arguments.Count = 1, _
+	"WScript.Arguments", "Need a command-line argument."
+```
+
+---
+
+`[].GetObject(strProgID) -> objCOM`
+
+若已存在 *COM* 对象，则直接得到，否则创建一个。
+
+```
+[].Set objWord, [].GetObject("Word.Application")
+```
+
+---
+
+`[].Unless boolPredicate, varSubprogram`
+
+若谓词不满足，则执行子程序。
+
+```
+[].Unless True, [].Function("", "Msgbox 1")
+[].Unless False, [].Function("", "Msgbox 2")
+```
+
+---
+
+`[].Min(numA, numB) -> numMinimum`
+
+取双参中的最小值。
+
+```
+Msgbox [].Min(-100, 100)
+
+arrTest =  Array(1, 0, -1, -100)
+Msgbox [].Reduce([].Lambda("i, j", "Return [].Min(i, j)", "[]", Array([])), arrTest, arrTest(0))
+```
+
+---
+
+`[].Max(numA, numB) -> numMaximum`
+
+取双参中的最大值。
+
+```
+Msgbox [].Max(-100, 100)
+
+arrTest =  Array(10, 0, -1, -100)
+Msgbox [].Reduce([].Lambda("i, j", "Return [].Max(i, j)", "[]", Array([])), arrTest, arrTest(0))
+```
+
+# 参考
 
 匈牙利命名：*lng* **Long**, *str* **String**, *obj* **Object**, *arr* **Array**, *var* **Variable**, *num* **Number**.
 
@@ -104,11 +480,11 @@ apply只接收匿名函数。
 
 # 贡献
 
+如果您发现任何 *BUG* ，请提交一个 *Issue* 。
+
 欢迎贡献代码！
 
-代码中的变量须遵守匈牙利命名规则。确保您的代码简洁明了。
-
-然后提交 *Pull Request* 即可！
+记得遵守匈牙利命名规则，然后提交 *Pull Request* 即可！
 
 # 参照
 

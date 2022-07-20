@@ -254,7 +254,9 @@ Msgbox Join([].Append(Array(1, 2), Array(3, 4)))
 Msgbox Join([].Flatten(Array(1, 2, Array(3, Array(4)), Array(Array(Array(Array(5)))))), " ")
 ```
 
-`Zip(varLeft, varRight) -> arrZipped`
+---
+
+`[].Zip(varLeft, varRight) -> arrZipped`
 
 ```
 ' Array(a, b, c), Array(d, e, f) ->
@@ -421,7 +423,9 @@ If strProgID available, get it directly, else create & get it.
 [].Unless False, [].Function("", "Msgbox 2")
 ```
 
-`Min(numA, numB) -> numMinimum`
+---
+
+`[].Min(numA, numB) -> numMinimum`
 
 Return the minimum value of two arguments.
 
@@ -432,7 +436,9 @@ arrTest =  Array(1, 0, -1, -100)
 Msgbox [].Reduce([].Lambda("i, j", "Return [].Min(i, j)", "[]", Array([])), arrTest, arrTest(0))
 ```
 
-`Max(numA, numB) -> numMaximum`
+---
+
+`[].Max(numA, numB) -> numMaximum`
 
 Return the maximum value of two arguments.
 
@@ -453,7 +459,9 @@ Hungarian notation: *lng* **Long**, *str* **String**, *obj* **Object**, *arr* **
 
 Welcome!
 
-Remember obey the Hungarian naming rule. Keep your code clear & meaningful.
+If you find any bug, please open an issue.
+
+If you want to add some code, remember obey the Hungarian naming rule.
 
 Then simply open your pull request!
 
