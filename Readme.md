@@ -101,7 +101,7 @@ Set [] = New Brackets
 
 ## Methods for Function
 
-*[].Function(strParameters, strBody) -> varFunction*
+`*[].Function(strParameters, strBody) -> varFunction*`
 
 A restricted anonymous function generator.
 
