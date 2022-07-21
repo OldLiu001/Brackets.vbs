@@ -332,7 +332,7 @@ Msgbox [].Apply([].Function("i, j", "Return i+j"), Array(12, 28))
 
 ---
 
-`[].GatherArguments(varFunction, varArguments) -> varReturn`
+`[].GatherArguments(varFunction) -> varWrappedFunction`
 
 将外层函数参数打包成数组传递给内层函数。
 
@@ -374,7 +374,7 @@ Msgbox [].Reduce([].Function("i, j", "Return i And j"), Array(True, True, False)
 
 `[].Every(arrArguments, varFunction) -> boolTested`
 
-判断是否所有宿主内的元素满足要求。
+判断是否所有数组内的元素满足要求。
 
 ```
 Msgbox [].Every(Array(1, 2, 3), [].Function("i", "Return i > 0"))
@@ -385,7 +385,7 @@ Msgbox [].Every(Array(1, -1), [].Function("i", "Return i > 0"))
 
 `[].Some(arrArguments, varFunction) -> boolTested`
 
-判断是否有宿主内的元素满足要求。
+判断是否有数组内的元素满足要求。
 
 ```
 Msgbox [].Some(Array(1, -1), [].Function("i", "Return i > 0"))

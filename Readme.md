@@ -313,7 +313,7 @@ Same as `[].Apply`.
 
 ---
 
-`[].GatherArguments(varFunction, varArguments) -> varReturn`
+`[].GatherArguments(varFunction) -> varWrappedFunction`
 
 ```
 ' varFunction(a, b, c, ...) -> varFunciton(Array(a, b, c, ...))
