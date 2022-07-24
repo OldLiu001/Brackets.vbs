@@ -17,6 +17,7 @@ Class Brackets
 			"End If", _
 			"varFunction", Array(Empty))
 
+		''TODO FIX
 		[Set] Compose, Lambda("", _
 			"If IsEmpty(arrFunctions) Then" & vbNewLine & _
 			"	arrFunctions = Arguments" & vbNewLine & _
@@ -26,7 +27,7 @@ Class Brackets
 			"		[].Function(" & _
 			"			""varData, varFunction"", " & _
 			"			""Return varFunction(varData)""), " & _
-			"		arrFunctions, Arguments(0))"& vbNewLine & _
+			"		[].Append(Arguments, arrFunctions))"& vbNewLine & _
 			"End If", _
 			"arrFunctions", Array(Empty))
 	End Sub
@@ -165,18 +166,24 @@ Class Brackets
 		Filter = arrFiltered
 	End Function
 
-	Public Function Accumulate(varFunction, varSet, varInitialValue)
-		[Set] Accumulate, varInitialValue
+	Public Function Accumulate(varFunction, varSet)
 		Dim varItem
+		Dim boolFirst
+		boolFirst = True
 		For Each varItem In varSet
-			[Set] Accumulate, varFunction(Accumulate, varItem)
+			If boolFirst Then
+				[Set] Accumulate, varItem
+				boolFirst = False
+			Else
+				[Set] Accumulate, varFunction(Accumulate, varItem)
+			End If
 		Next
 	End Function
 
-	Public Function Reduce(varFunction, varSet, varInitialValue)
+	Public Function Reduce(varFunction, varSet)
 		' Same as Accumulate(), just a alias.
 
-		[Set] Reduce, Accumulate(varFunction, varSet, varInitialValue)
+		[Set] Reduce, Accumulate(varFunction, varSet)
 	End Function
 
 	Public Function [GetObject](strProgID)
@@ -242,13 +249,13 @@ Class Brackets
 	Public Function Every(arrArguments, varFunction)
 		Every = Accumulate( _
 			[Function]("boolLeft, boolRight", "Return boolLeft And boolRight"), _
-			Map(varFunction, arrArguments), True)
+			Map(varFunction, arrArguments))
 	End Function
 
 	Public Function Some(arrArguments, varFunction)
 		Some = Accumulate( _
 			[Function]("boolLeft, boolRight", "Return boolLeft Or boolRight"), _
-			Map(varFunction, arrArguments), False)
+			Map(varFunction, arrArguments))
 	End Function
 
 	Public Function Once(varFunction)
@@ -294,6 +301,7 @@ Class Brackets
 		Zip = arrZipped
 	End Function
 
+	''TODO Fix
 	Public Function Curry(varFunction, lngArgumentsCount)
 		[Set] Curry, Lambda("", _
 			"arrSavedArguments = [].Append(arrSavedArguments, Arguments)" & vbNewLine & _

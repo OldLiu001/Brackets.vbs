@@ -221,7 +221,7 @@ Msgbox [].Compose(varF1,varF2,varF3)(1)
 ' Range(1,3,0) -> Error
 ' Range(1,3,-1) -> Array()
 
-Msgbox [].Reduce([].Function("i, j", "Return i * j"), [].Range(1,6,1), 1)
+Msgbox [].Reduce([].Function("i, j", "Return i * j"), [].Range(1,6,1))
 ```
 
 ---
@@ -333,19 +333,23 @@ Msgbox Join([].Filter([].Function("i", "Return i > 4"), Array(1,3,5,7)), " ")
 
 ---
 
-`[].Reduce(varFunction, varSet, varInitialValue) -> varReduced`
+`[].Reduce(varFunction, varSet) -> varReduced`
+
+`[].Reduce(varFunction, [].Append(Array(varInitialValue), varSet)) -> varReduced`
 
 Use binary arguments function to reduce an array to a single variable.
 
 ```
-Msgbox [].Reduce([].Function("i, j", "Return i * j"), [].Range(1,6,1), 1)
-Msgbox [].Reduce([].Function("i, j", "Return i Or j"), Array(True, True, False), False)
-Msgbox [].Reduce([].Function("i, j", "Return i And j"), Array(True, True, False), True)
+Msgbox [].Reduce([].Function("i, j", "Return i * j"), [].Range(1,6,1))
+Msgbox [].Reduce([].Function("i, j", "Return i Or j"), Array(True, True, False))
+Msgbox [].Reduce([].Function("i, j", "Return i And j"), Array(True, True, False))
 ```
 
 ---
 
-`[].Accumulate(varFunction, varSet, varInitialValue) -> varAccumulated`
+`[].Accumulate(varFunction, varSet) -> varAccumulated`
+
+`[].Accumulate(varFunction, [].Append(Array(varInitialValue), varSet)) -> varAccumulated`
 
 Same as `[].Reduce`.
 
@@ -433,7 +437,7 @@ Return the minimum value of two arguments.
 Msgbox [].Min(-100, 100)
 
 arrTest =  Array(1, 0, -1, -100)
-Msgbox [].Reduce([].Lambda("i, j", "Return [].Min(i, j)", "[]", Array([])), arrTest, arrTest(0))
+Msgbox [].Reduce([].Lambda("i, j", "Return [].Min(i, j)", "[]", Array([])), arrTest)
 ```
 
 ---
@@ -446,7 +450,7 @@ Return the maximum value of two arguments.
 Msgbox [].Max(-100, 100)
 
 arrTest =  Array(10, 0, -1, -100)
-Msgbox [].Reduce([].Lambda("i, j", "Return [].Max(i, j)", "[]", Array([])), arrTest, arrTest(0))
+Msgbox [].Reduce([].Lambda("i, j", "Return [].Max(i, j)", "[]", Array([])), arrTest)
 ```
 
 # References

@@ -63,12 +63,10 @@
 		<method name="Accumulate">
 			<PARAMETER name="varFunction"/>
 			<PARAMETER name="varSet"/>
-			<PARAMETER name="varInitialValue"/>
 		</method>
 		<method name="Reduce">
 			<PARAMETER name="varFunction"/>
 			<PARAMETER name="varSet"/>
-			<PARAMETER name="varInitialValue"/>
 		</method>
 		<method name="GetObject" internalName="GetCOMObject">
 			<PARAMETER name="strProgID"/>
@@ -183,12 +181,12 @@
 				[Set] Filter, [].Filter(varFunction, varSet)
 			End Function
 
-			Public Function Accumulate(varFunction, varSet, varInitialValue)
-				[Set] Accumulate, [].Accumulate(varFunction, varSet, varInitialValue)
+			Public Function Accumulate(varFunction, varSet)
+				[Set] Accumulate, [].Accumulate(varFunction, varSet)
 			End Function
 
-			Public Function Reduce(varFunction, varSet, varInitialValue)
-				[Set] Reduce, [].Reduce(varFunction, varSet, varInitialValue)
+			Public Function Reduce(varFunction, varSet)
+				[Set] Reduce, [].Reduce(varFunction, varSet)
 			End Function
 
 			Public Function GetCOMObject(strProgID)

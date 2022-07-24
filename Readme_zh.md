@@ -228,7 +228,7 @@ Msgbox [].Compose(varF1,varF2,varF3)(1)
 ' Range(1,3,0) -> Error
 ' Range(1,3,-1) -> Array()
 
-Msgbox [].Reduce([].Function("i, j", "Return i * j"), [].Range(1,6,1), 1)
+Msgbox [].Reduce([].Function("i, j", "Return i * j"), [].Range(1,6,1))
 ```
 
 ---
@@ -354,19 +354,23 @@ Msgbox Join([].Filter([].Function("i", "Return i > 4"), Array(1,3,5,7)), " ")
 
 ---
 
-`[].Reduce(varFunction, varSet, varInitialValue) -> varReduced`
+`[].Reduce(varFunction, varSet) -> varReduced`
+
+`[].Reduce(varFunction, [].Append(Array(varInitialValue), varSet)) -> varReduced`
 
 使用二元函数归约/累积数组至一个值。
 
 ```
-Msgbox [].Reduce([].Function("i, j", "Return i * j"), [].Range(1,6,1), 1)
-Msgbox [].Reduce([].Function("i, j", "Return i Or j"), Array(True, True, False), False)
-Msgbox [].Reduce([].Function("i, j", "Return i And j"), Array(True, True, False), True)
+Msgbox [].Reduce([].Function("i, j", "Return i * j"), [].Range(1,6,1))
+Msgbox [].Reduce([].Function("i, j", "Return i Or j"), Array(True, True, False))
+Msgbox [].Reduce([].Function("i, j", "Return i And j"), Array(True, True, False))
 ```
 
 ---
 
-`[].Accumulate(varFunction, varSet, varInitialValue) -> varAccumulated`
+`[].Accumulate(varFunction, varSet) -> varAccumulated`
+
+`[].Accumulate(varFunction, [].Append(Array(varInitialValue), varSet)) -> varAccumulated`
 
 与 `[].Reduce` 同。
 
@@ -456,7 +460,7 @@ Msgbox [].If(0.1 + 0.2 = 0.3, "0.1 + 0.2 = 0.3", "0.1 + 0.2 <> 0.3")
 Msgbox [].Min(-100, 100)
 
 arrTest =  Array(1, 0, -1, -100)
-Msgbox [].Reduce([].Lambda("i, j", "Return [].Min(i, j)", "[]", Array([])), arrTest, arrTest(0))
+Msgbox [].Reduce([].Lambda("i, j", "Return [].Min(i, j)", "[]", Array([])), arrTest)
 ```
 
 ---
@@ -469,7 +473,7 @@ Msgbox [].Reduce([].Lambda("i, j", "Return [].Min(i, j)", "[]", Array([])), arrT
 Msgbox [].Max(-100, 100)
 
 arrTest =  Array(10, 0, -1, -100)
-Msgbox [].Reduce([].Lambda("i, j", "Return [].Max(i, j)", "[]", Array([])), arrTest, arrTest(0))
+Msgbox [].Reduce([].Lambda("i, j", "Return [].Max(i, j)", "[]", Array([])), arrTest)
 ```
 
 # 参考
