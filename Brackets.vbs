@@ -17,7 +17,6 @@ Class Brackets
 			"End If", _
 			"varFunction", Array(Empty))
 
-		''TODO FIX
 		[Set] Compose, Lambda("", _
 			"If IsEmpty(arrFunctions) Then" & vbNewLine & _
 			"	arrFunctions = Arguments" & vbNewLine & _
@@ -301,17 +300,17 @@ Class Brackets
 		Zip = arrZipped
 	End Function
 
-	''TODO Fix
 	Public Function Curry(varFunction, lngArgumentsCount)
 		[Set] Curry, Lambda("", _
-			"arrSavedArguments = [].Append(arrSavedArguments, Arguments)" & vbNewLine & _
-			"If UBound(arrSavedArguments) = lngArgumentsCount - 1 Then" & vbNewLine & _
-			"	Return [].Apply(varFunction, arrSavedArguments)" & vbNewLine & _
+			"If UBound(Arguments) = lngArgumentsCount - 1 Then" & vbNewLine & _
+			"	Return [].Apply(varFunction, Arguments)" & vbNewLine & _
 			"Else" & vbNewLine & _
-			"	Return Callee" & vbNewLine & _
+			"	Return [].Curry(" & _
+			"		[].Partial(varFunction, Arguments), " & _
+			"		lngArgumentsCount - UBound(Arguments) - 1)" & _
 			"End If", _
-			"[], varFunction, lngArgumentsCount, arrSavedArguments", _
-			Array([], varFunction, lngArgumentsCount, Array()))
+			"[], varFunction, lngArgumentsCount", _
+			Array([], varFunction, lngArgumentsCount))
 	End Function
 
 	Public Function Partial(varFunction, arrArguments)
