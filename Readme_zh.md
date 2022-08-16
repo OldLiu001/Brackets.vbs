@@ -496,6 +496,8 @@ Msgbox [].Reduce([].Lambda("i, j", "Return [].Max(i, j)", "[]", Array([])), arrT
 
 - [Python](https://www.python.org/)
 
+- [Haskell](https://www.haskell.org/)
+
 - [underscore.js](https://github.com/jashkenas/underscore)
 
 - [lodash.js](https://github.com/lodash/lodash)

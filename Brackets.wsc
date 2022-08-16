@@ -124,6 +124,12 @@
 		</method>
 		<method name="Compose">
 		</method>
+		<method name="Inc">
+			<PARAMETER name="lngNumber"/>
+		</method>
+		<method name="Dec">
+			<PARAMETER name="lngNumber"/>
+		</method>
 	</public>
 	<script language="JScript" src="./Brackets.js" />
 	<script language="VBScript" src="./Brackets.vbs" />
@@ -250,6 +256,14 @@
 
 			Dim Compose
 			[Set] Compose, [].Compose
+
+			Public Function Inc(ByRef lngNumber)
+				[].Inc lngNumber
+			End Function
+
+			Public Function Dec(ByRef lngNumber)
+				[].Dec lngNumber
+			End Function
 		]]>
 	</script>
 </component>

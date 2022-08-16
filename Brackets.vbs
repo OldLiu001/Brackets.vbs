@@ -58,11 +58,27 @@ Class Brackets
 		Set Lambda = [_].GatherArguments(Lambda)
 	End Function
 
+	Public Function L(strParameters, strBody, strBindings, arrBindings)
+		[Set] L, Lambda(strParameters, strBody, strBindings, arrBindings)
+	End Function
+
 	Public Function [Function](strParameters, strBody)
 		' A restricted anonymous function generator.
 		' The function it generates can only refer to the arguments & built-in functions in VBScript.
 
 		Set [Function] = Lambda(strParameters, strBody, "", Empty)
+	End Function
+
+	Public Function F(strParameters, strBody)
+		[Set] F, [Function](strParameters, strBody)
+	End Function
+
+	Public Function Expression(strParameters, strExpression)
+		[Set] Expression, [Function](strParameters, "Return " & strExpression)
+	End Function
+
+	Public Function E(strParameters, strExpression)
+		[Set] E, Expression(strParameters, strExpression)
 	End Function
 
 	Public Sub Assert(boolCondition, strSource, strDescription)
@@ -332,10 +348,24 @@ Class Brackets
 		[Set] Reverse, arrReversed
 	End Function
 
+	Public Sub Inc(ByRef lngNumber)
+		lngNumber = lngNumber + 1
+	End Sub
+
+	Public Sub Dec(ByRef lngNumber)
+		lngNumber = lngNumber - 1
+	End Sub
+
+	Public Function CStream(varIter)
+	End Function
+
 	Public Function Chain
 	End Function
 
 	Public Function Value
+	End Function
+
+	Public Function Memorize
 	End Function
 End Class
 
