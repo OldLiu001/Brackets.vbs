@@ -367,6 +367,13 @@ Class Brackets
 
 	Public Function Memorize
 	End Function
+
+	Public Sub Swap(ByRef varA, ByRef varB)
+		Dim varTemp
+		[Set] varTemp, varA
+		[Set] varA, varB
+		[Set] varB, varTemp
+	End Sub
 End Class
 
 Class Lazy

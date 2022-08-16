@@ -130,6 +130,10 @@
 		<method name="Dec">
 			<PARAMETER name="lngNumber"/>
 		</method>
+		<method name="Swap">
+			<PARAMETER name="varA"/>
+			<PARAMETER name="varB"/>
+		</method>
 	</public>
 	<script language="JScript" src="./Brackets.js" />
 	<script language="VBScript" src="./Brackets.vbs" />
@@ -257,13 +261,17 @@
 			Dim Compose
 			[Set] Compose, [].Compose
 
-			Public Function Inc(ByRef lngNumber)
+			Public Sub Inc(ByRef lngNumber)
 				[].Inc lngNumber
-			End Function
+			End Sub
 
-			Public Function Dec(ByRef lngNumber)
+			Public Sub Dec(ByRef lngNumber)
 				[].Dec lngNumber
-			End Function
+			End Sub
+
+			Public Sub Swap(ByRef varA, ByRef varB)
+				[].Swap varA, varB
+			End Sub
 		]]>
 	</script>
 </component>
