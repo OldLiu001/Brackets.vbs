@@ -116,7 +116,7 @@ Msgbox [].Function("", "Return Arguments(0) + Arguments(1)")(2001, 1228)
 Msgbox [].Function("", "Return Join(Arguments, "" "")")(2001, 1228)
 ```
 
-参数 `strParameters` 不支持前缀 `ByRef` 以及 `ByVal`。你可以把它想象成永远 `ByVal`。
+参数 `strParameters` 不支持前缀 `ByRef` 以及 `ByVal`。你可以把它看作永远 `ByVal`。
 
 关键字 `Return` 表示保存返回值，它不会真正返回。
 
@@ -413,7 +413,7 @@ Msgbox [].Some(Array(0, -1), [].Function("i", "Return i > 0"))
 
 类似其它语言中的三目运算符，但没有短路求值。
 
-```	
+```
 Msgbox [].If(2000 > 3000, "2000￥ > 3000$", "2000￥ <= 3000$")
 Msgbox [].If(0.1 + 0.2 = 0.3, "0.1 + 0.2 = 0.3", "0.1 + 0.2 <> 0.3")
 ```

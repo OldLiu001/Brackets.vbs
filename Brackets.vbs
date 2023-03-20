@@ -1,379 +1,392 @@
-Option Explicit
+'Option Explicit
+
+Public Function VbsExpr(strCode)
+	VbsExpr = Array(Eval(strCode))
+End Function
+
+Public Sub VbsExec(strCode)
+    Execute strCode
+End Sub
+
+set z = new Brackets
 
 Class Brackets
-	Private []
-
-	Public Compose, GatherArguments
-	Private Sub Class_Initialize
-		Set [] = New Brackets
-
-		' varFunction(a, b, c, ...) -> varFunciton(Array(a, b, c, ...))
-		[Set] GatherArguments, Lambda("", _
-			"If IsEmpty(varFunction) Then" & vbNewLine & _
-			"	Set varFunction = Arguments(0)" & vbNewLine & _
-			"	Return Callee" & vbNewLine & _
-			"Else" & vbNewLine & _
-			"	Return varFunction(Arguments)" & vbNewLine & _
-			"End If", _
-			"varFunction", Array(Empty))
-
-		[Set] Compose, Lambda("", _
-			"If IsEmpty(arrFunctions) Then" & vbNewLine & _
-			"	arrFunctions = Arguments" & vbNewLine & _
-			"	Return Callee" & vbNewLine & _
-			"Else" & vbNewLine & _
-			"	Return [].Reduce(" & _
-			"		[].Function(" & _
-			"			""varData, varFunction"", " & _
-			"			""Return varFunction(varData)""), " & _
-			"		[].Append(Arguments, arrFunctions))"& vbNewLine & _
-			"End If", _
-			"arrFunctions", Array(Empty))
-	End Sub
-
-	Public Sub [Set](ByRef varVariable, varValue)
-		' Unify the way of assignment in VBScript.
-
-		If IsObject(varValue) Then
-			Set varVariable = varValue
-		Else
-			varVariable = varValue
-		End If
-	End Sub
-
-	Public Function [If](boolCondition, varTrue, varFalse)
-		' Just like ternary operator in other languages.
-		' But no short-circuit, all arguments will be evaluated.
-
-		[Set] [If], Array(varTrue,varFalse)((boolCondition) + 1)
+	Public Function Wrap(varValue)
+		Wrap = Array(varValue)
 	End Function
 
-	Public Function Lambda(strParameters, strBody, strBindings, arrBindings)
-		' Argument "strParameters" & "strBindings" doesn't support prefix "ByRef" & "ByVal".
-		' You can think of it as always "ByVal".
-		' Keyword "Return" means save the return value, It will not really return.
 
-		Set Lambda = New AnonymousFunction
-		Lambda.Init strParameters, strBody, strBindings, arrBindings
-		Set Lambda = [_].GatherArguments(Lambda)
-	End Function
+	' Private []
 
-	Public Function L(strParameters, strBody, strBindings, arrBindings)
-		[Set] L, Lambda(strParameters, strBody, strBindings, arrBindings)
-	End Function
+	' Public Compose, GatherArguments
+	' Private Sub Class_Initialize
+	' 	Set [] = New Brackets
 
-	Public Function [Function](strParameters, strBody)
-		' A restricted anonymous function generator.
-		' The function it generates can only refer to the arguments & built-in functions in VBScript.
+	' 	' varFunction(a, b, c, ...) -> varFunciton(Array(a, b, c, ...))
+	' 	[Set] GatherArguments, Lambda("", _
+	' 		"If IsEmpty(varFunction) Then" & vbNewLine & _
+	' 		"	Set varFunction = Arguments(0)" & vbNewLine & _
+	' 		"	Return Callee" & vbNewLine & _
+	' 		"Else" & vbNewLine & _
+	' 		"	Return varFunction(Arguments)" & vbNewLine & _
+	' 		"End If", _
+	' 		"varFunction", Array(Empty))
 
-		Set [Function] = Lambda(strParameters, strBody, "", Empty)
-	End Function
+	' 	[Set] Compose, Lambda("", _
+	' 		"If IsEmpty(arrFunctions) Then" & vbNewLine & _
+	' 		"	arrFunctions = Arguments" & vbNewLine & _
+	' 		"	Return Callee" & vbNewLine & _
+	' 		"Else" & vbNewLine & _
+	' 		"	Return [].Reduce(" & _
+	' 		"		[].Function(" & _
+	' 		"			""varData, varFunction"", " & _
+	' 		"			""Return varFunction(varData)""), " & _
+	' 		"		[].Append(Arguments, arrFunctions))"& vbNewLine & _
+	' 		"End If", _
+	' 		"arrFunctions", Array(Empty))
+	' End Sub
 
-	Public Function F(strParameters, strBody)
-		[Set] F, [Function](strParameters, strBody)
-	End Function
+	' Public Sub [Set](ByRef varVariable, varValue)
+	' 	' Unify the way of assignment in VBScript.
 
-	Public Function Expression(strParameters, strExpression)
-		[Set] Expression, [Function](strParameters, "Return " & strExpression)
-	End Function
+	' 	If IsObject(varValue) Then
+	' 		Set varVariable = varValue
+	' 	Else
+	' 		varVariable = varValue
+	' 	End If
+	' End Sub
 
-	Public Function E(strParameters, strExpression)
-		[Set] E, Expression(strParameters, strExpression)
-	End Function
+	' Public Function [If](boolCondition, varTrue, varFalse)
 
-	Public Sub Assert(boolCondition, strSource, strDescription)
-		' !boolCondition -> Error
+	' 	[Set] [If], Array(varTrue,varFalse)((boolCondition) + 1)
+	' End Function
 
-		If Not boolCondition Then
-			Err.Raise vbObjectError, strSource, strDescription
-		End If
-	End Sub
+	' Public Function Lambda(strParameters, strBody, strBindings, arrBindings)
+	' 	' Argument "strParameters" & "strBindings" doesn't support prefix "ByRef" & "ByVal".
+	' 	' You can think of it as always "ByVal".
+	' 	' Keyword "Return" means save the return value, It will not really return.
 
-	Public Function Range(numStart, numStop, numStep)
-		' Range(1,3,1) -> Array(1,2,3)
-		' Range(1,3,9) -> Array(1)
-		' Range(1,3,0) -> Error
-		' Range(1,3,-1) -> Array()
+	' 	Set Lambda = New AnonymousFunction
+	' 	Lambda.Init strParameters, strBody, strBindings, arrBindings
+	' 	Set Lambda = [_].GatherArguments(Lambda)
+	' End Function
 
-		Assert numStep <> 0, "<Function> Range", "Step length must not be zero."
-		
-		If (numStop - numStart) / numStep >= 0 Then
-			Dim arrRange(), numCounter, lngPointer
-			ReDim arrRange(Fix((numStop - numStart) / numStep))
-		
-			lngPointer = 0
-			For numCounter = numStart To numStop Step numStep
-				arrRange(lngPointer) = numCounter
-				lngPointer = lngPointer + 1
-			Next
-			Range = arrRange
-		Else
-			Range = Array()
-		End If
-	End Function
+	' Public Function L(strParameters, strBody, strBindings, arrBindings)
+	' 	[Set] L, Lambda(strParameters, strBody, strBindings, arrBindings)
+	' End Function
 
-	Public Function Map(varFunction, varSet)
-		' Func, Array(item1,item2,...) -> Array(Func(item1),Func(item2),...)
+	' Public Function [Function](strParameters, strBody)
+	' 	' A restricted anonymous function generator.
+	' 	' The function it generates can only refer to the arguments & built-in functions in VBScript.
 
-		Dim arrMap(), varItem, lngPointer
-		ReDim arrMap(1)
-		lngPointer = -1
-		For Each varItem In varSet
-			lngPointer = lngPointer + 1
-			If UBound(arrMap) < lngPointer Then
-				ReDim Preserve arrMap(UBound(arrMap) * 2)
-			End If
-			[Set] arrMap(lngPointer), varFunction(varItem)
-		Next
-		ReDim Preserve arrMap(lngPointer)
-		Map = arrMap
-	End Function
+	' 	Set [Function] = Lambda(strParameters, strBody, "", Empty)
+	' End Function
 
-	Public Sub ForEach(varSubprogram, varSet)
-		' A special Map which don't need return value.
-		' So there has a simpler but slower implement:
-		' Map varSubprogram, varSet
+	' Public Function F(strParameters, strBody)
+	' 	[Set] F, [Function](strParameters, strBody)
+	' End Function
 
-		Dim varItem
-		For Each varItem In varSet
-			Call varSubprogram(varItem)
-		Next
-	End Sub
+	' Public Function Expression(strParameters, strExpression)
+	' 	[Set] Expression, [Function](strParameters, "Return " & strExpression)
+	' End Function
 
-	Public Function Apply(varFunction, varArguments)
-		' varFunciton, Array(a, b, c, ...) -> varFunction(a, b, c, ...)
-		' Support only Anonymous Function
+	' Public Function E(strParameters, strExpression)
+	' 	[Set] E, Expression(strParameters, strExpression)
+	' End Function
 
-		[Set] Apply, [_].SpreadArguments(varFunction, CArray(varArguments))
-	End Function
+	' Public Sub Assert(boolCondition, strSource, strDescription)
+	' 	' !boolCondition -> Error
 
-	Public Function SpreadArguments(varFunction, varArguments)
-		[Set] SpreadArguments, Apply(varFunction, varArguments)
-	End Function
+	' 	If Not boolCondition Then
+	' 		Err.Raise vbObjectError, strSource, strDescription
+	' 	End If
+	' End Sub
 
-	Public Function CArray(varSet) 'Set & Array -> Array
-		' A simpler & slower implement:
-		' CArray = Map([Function]("x", "Return x"), varSet)
+	' Public Function Range(numStart, numStop, numStep)
+	' 	' Range(1,3,1) -> Array(1,2,3)
+	' 	' Range(1,3,9) -> Array(1)
+	' 	' Range(1,3,0) -> Error
+	' 	' Range(1,3,-1) -> Array()
 
-		If IsArray(varSet) Then 'just for efficiency
-			CArray = varSet
-		Else ' Deal with sets, e.g. "FSO.Drives"
-			' You can expand this for higher efficiency.
-			CArray = Map([Function]("x", "Return x"), varSet)
-		End If
-	End Function
+	' 	Assert numStep <> 0, "<Function> Range", "Step length must not be zero."
 
-	Public Function Filter(varFunction, varSet)
-		Dim lngPointer, arrFiltered(), varItem
-		ReDim arrFiltered(1)
-		lngPointer = -1
-		For Each varItem In varSet
-			If varFunction(varItem) Then
-				lngPointer = lngPointer + 1
-				ReDim Preserve arrFiltered( _
-					[If](lngPointer > UBound(arrFiltered), _
-						UBound(arrFiltered) * 2, _
-						UBound(arrFiltered)))
-				[Set] arrFiltered(lngPointer), varItem
-			End If
-		Next
-		ReDim Preserve arrFiltered(lngPointer)
-		Filter = arrFiltered
-	End Function
+	' 	If (numStop - numStart) / numStep >= 0 Then
+	' 		Dim arrRange(), numCounter, lngPointer
+	' 		ReDim arrRange(Fix((numStop - numStart) / numStep))
 
-	Public Function Accumulate(varFunction, varSet)
-		Dim varItem
-		Dim boolFirst
-		boolFirst = True
-		For Each varItem In varSet
-			If boolFirst Then
-				[Set] Accumulate, varItem
-				boolFirst = False
-			Else
-				[Set] Accumulate, varFunction(Accumulate, varItem)
-			End If
-		Next
-	End Function
+	' 		lngPointer = 0
+	' 		For numCounter = numStart To numStop Step numStep
+	' 			arrRange(lngPointer) = numCounter
+	' 			lngPointer = lngPointer + 1
+	' 		Next
+	' 		Range = arrRange
+	' 	Else
+	' 		Range = Array()
+	' 	End If
+	' End Function
 
-	Public Function Reduce(varFunction, varSet)
-		' Same as Accumulate(), just a alias.
+	' Public Function Map(varFunction, varSet)
+	' 	' Func, Array(item1,item2,...) -> Array(Func(item1),Func(item2),...)
 
-		[Set] Reduce, Accumulate(varFunction, varSet)
-	End Function
+	' 	Dim arrMap(), varItem, lngPointer
+	' 	ReDim arrMap(1)
+	' 	lngPointer = -1
+	' 	For Each varItem In varSet
+	' 		lngPointer = lngPointer + 1
+	' 		If UBound(arrMap) < lngPointer Then
+	' 			ReDim Preserve arrMap(UBound(arrMap) * 2)
+	' 		End If
+	' 		[Set] arrMap(lngPointer), varFunction(varItem)
+	' 	Next
+	' 	ReDim Preserve arrMap(lngPointer)
+	' 	Map = arrMap
+	' End Function
 
-	Public Function [GetObject](strProgID)
-		' If strProgID available, get it directly, else create & get it.
+	' Public Sub ForEach(varSubprogram, varSet)
+	' 	' A special Map which don't need return value.
+	' 	' So there has a simpler but slower implement:
+	' 	' Map varSubprogram, varSet
 
-		On Error Resume Next
-		Set objCOM = GetObject(, strProgID)
-		If Err.Number <> 0 Then
-			Err.Clear
-			Set objCOM = CreateObject(strProgID)
-			Assume Err.Number = 0, "<Function> GetObject", _
-				"Create COM object """ & strProgID & """ failed."
-		End If
-		On Error Goto 0
-	End Function
+	' 	Dim varItem
+	' 	For Each varItem In varSet
+	' 		Call varSubprogram(varItem)
+	' 	Next
+	' End Sub
 
-	Public Function Append(varSet1, varSet2)
-		' Array(1,2), Array(3) -> Array(1,2,3)
-		Dim arrCombined(), lngPtr, varItem, varSet
-		ReDim arrCombined(1)
-		
-		lngPtr = -1
-		For Each varSet In Array(varSet1, varSet2)
-			For Each varItem In varSet
-				lngPtr = lngPtr + 1
-				ReDim Preserve arrCombined( _
-					[If](lngPtr > UBound(arrCombined), _
-						UBound(arrCombined) * 2, _
-						UBound(arrCombined)))
-				[Set] arrCombined(lngPtr), varItem
-			Next
-		Next
+	' Public Function Apply(varFunction, varArguments)
+	' 	' varFunciton, Array(a, b, c, ...) -> varFunction(a, b, c, ...)
+	' 	' Support only Anonymous Function
 
-		ReDim Preserve arrCombined(lngPtr)
-		Append = arrCombined
-	End Function
+	' 	[Set] Apply, [_].SpreadArguments(varFunction, CArray(varArguments))
+	' End Function
 
-	Public Function Flatten(arrNested)
-		If IsArray(arrNested) Then
-			Flatten = Array()
-			Dim varItem
-			For Each varItem In arrNested
-				Flatten = Append(Flatten, Flatten(varItem))
-			Next
-		Else
-			Flatten = Array(arrNested)
-		End If
-	End Function
+	' Public Function SpreadArguments(varFunction, varArguments)
+	' 	[Set] SpreadArguments, Apply(varFunction, varArguments)
+	' End Function
 
-	Public Sub Unless(boolPredicate, varSubprogram)
-		If Not boolPredicate Then
-			Call varSubprogram()
-		End If
-	End Sub
+	' Public Function CArray(varSet) 'Set & Array -> Array
+	' 	' A simpler & slower implement:
+	' 	' CArray = Map([Function]("x", "Return x"), varSet)
 
-	Public Sub Times(varSubprogram, lngTimes)
-		Dim lngCounter
-		For lngCounter = 1 To lngTimes
-			Call varSubprogram()
-		Next
-	End Sub
+	' 	If IsArray(varSet) Then 'just for efficiency
+	' 		CArray = varSet
+	' 	Else ' Deal with sets, e.g. "FSO.Drives"
+	' 		' You can expand this for higher efficiency.
+	' 		CArray = Map([Function]("x", "Return x"), varSet)
+	' 	End If
+	' End Function
 
-	Public Function Every(arrArguments, varFunction)
-		Every = Accumulate( _
-			[Function]("boolLeft, boolRight", "Return boolLeft And boolRight"), _
-			Map(varFunction, arrArguments))
-	End Function
+	' Public Function Filter(varFunction, varSet)
+	' 	Dim lngPointer, arrFiltered(), varItem
+	' 	ReDim arrFiltered(1)
+	' 	lngPointer = -1
+	' 	For Each varItem In varSet
+	' 		If varFunction(varItem) Then
+	' 			lngPointer = lngPointer + 1
+	' 			ReDim Preserve arrFiltered( _
+	' 				[If](lngPointer > UBound(arrFiltered), _
+	' 					UBound(arrFiltered) * 2, _
+	' 					UBound(arrFiltered)))
+	' 			[Set] arrFiltered(lngPointer), varItem
+	' 		End If
+	' 	Next
+	' 	ReDim Preserve arrFiltered(lngPointer)
+	' 	Filter = arrFiltered
+	' End Function
 
-	Public Function Some(arrArguments, varFunction)
-		Some = Accumulate( _
-			[Function]("boolLeft, boolRight", "Return boolLeft Or boolRight"), _
-			Map(varFunction, arrArguments))
-	End Function
+	' Public Function Accumulate(varFunction, varSet)
+	' 	Dim varItem
+	' 	Dim boolFirst
+	' 	boolFirst = True
+	' 	For Each varItem In varSet
+	' 		If boolFirst Then
+	' 			[Set] Accumulate, varItem
+	' 			boolFirst = False
+	' 		Else
+	' 			[Set] Accumulate, varFunction(Accumulate, varItem)
+	' 		End If
+	' 	Next
+	' End Function
 
-	Public Function Once(varFunction)
-		Set Once = Lambda( _
-			"", _
-			"If boolFirst Then [].Apply varFunction, Arguments : boolFirst = False", _
-			"boolFirst, [], varFunction", _
-			Array(True, [], varFunction))
-	End Function
+	' Public Function Reduce(varFunction, varSet)
+	' 	' Same as Accumulate(), just a alias.
 
-	Public Function Min(numA, numB)
-		Min = [If](numA < numB, numA, numB)
-	End Function
+	' 	[Set] Reduce, Accumulate(varFunction, varSet)
+	' End Function
 
-	Public Function Max(numA, numB)
-		Max = [If](numA > numB, numA, numB)
-	End Function
+	' Public Function [GetObject](strProgID)
+	' 	' If strProgID available, get it directly, else create & get it.
 
-	Public Function Zip(varLeft, varRight)
-		' Array(a, b, c), Array(d, e, f) ->
-		' Array(Array(a, d), Array(b, e), Array(c, f))
+	' 	On Error Resume Next
+	' 	Set objCOM = GetObject(, strProgID)
+	' 	If Err.Number <> 0 Then
+	' 		Err.Clear
+	' 		Set objCOM = CreateObject(strProgID)
+	' 		Assume Err.Number = 0, "<Function> GetObject", _
+	' 			"Create COM object """ & strProgID & """ failed."
+	' 	End If
+	' 	On Error Goto 0
+	' End Function
 
-		Dim arrLeft, arrRight
-		arrLeft = CArray(varLeft)
-		arrRight = CArray(varRight)
+	' Public Function Append(varSet1, varSet2)
+	' 	' Array(1,2), Array(3) -> Array(1,2,3)
+	' 	Dim arrCombined(), lngPtr, varItem, varSet
+	' 	ReDim arrCombined(1)
 
-		Dim lngPtr
-		Dim arrZipped()
-		ReDim arrZipped(1)
-		For lngPtr = _
-			0 To Min(UBound(varLeft), UBound(varRight))
-			ReDim Preserve arrZipped( _
-				[If](lngPtr > UBound(arrZipped), _
-					UBound(arrZipped) * 2, _
-					UBound(arrZipped)))
-			arrZipped(lngPtr) = Append( _
-				Array(varLeft(lngPtr)), _
-				Array(varRight(lngPtr)))
-		Next
+	' 	lngPtr = -1
+	' 	For Each varSet In Array(varSet1, varSet2)
+	' 		For Each varItem In varSet
+	' 			lngPtr = lngPtr + 1
+	' 			ReDim Preserve arrCombined( _
+	' 				[If](lngPtr > UBound(arrCombined), _
+	' 					UBound(arrCombined) * 2, _
+	' 					UBound(arrCombined)))
+	' 			[Set] arrCombined(lngPtr), varItem
+	' 		Next
+	' 	Next
 
-		ReDim Preserve arrZipped( _
-			Min(UBound(varLeft), UBound(varRight)))
-		Zip = arrZipped
-	End Function
+	' 	ReDim Preserve arrCombined(lngPtr)
+	' 	Append = arrCombined
+	' End Function
 
-	Public Function Curry(varFunction, lngArgumentsCount)
-		[Set] Curry, Lambda("", _
-			"If UBound(Arguments) = lngArgumentsCount - 1 Then" & vbNewLine & _
-			"	Return [].Apply(varFunction, Arguments)" & vbNewLine & _
-			"Else" & vbNewLine & _
-			"	Return [].Curry(" & _
-			"		[].Partial(varFunction, Arguments), " & _
-			"		lngArgumentsCount - UBound(Arguments) - 1)" & _
-			"End If", _
-			"[], varFunction, lngArgumentsCount", _
-			Array([], varFunction, lngArgumentsCount))
-	End Function
+	' Public Function Flatten(arrNested)
+	' 	If IsArray(arrNested) Then
+	' 		Flatten = Array()
+	' 		Dim varItem
+	' 		For Each varItem In arrNested
+	' 			Flatten = Append(Flatten, Flatten(varItem))
+	' 		Next
+	' 	Else
+	' 		Flatten = Array(arrNested)
+	' 	End If
+	' End Function
 
-	Public Function Partial(varFunction, arrArguments)
-		[Set] Partial, Lambda("", _
-			"Return [].Apply(varFunction, [].Append(arrArguments, Arguments))", _
-			"[], varFunction, arrArguments", _
-			Array([], varFunction, arrArguments))
-	End Function
+	' Public Sub Unless(boolPredicate, varSubprogram)
+	' 	If Not boolPredicate Then
+	' 		Call varSubprogram()
+	' 	End If
+	' End Sub
 
-	Public Function Reverse(varSet)
-		Dim arrSet, lngPtr, lngUpperBound
-		[Set] arrSet, CArray(varSet)
-		[Set] lngUpperBound, UBound(arrSet)
-		Dim arrReversed()
-		ReDim arrReversed(lngUpperBound)
-		For lngPtr = 0 To lngUpperBound
-			[Set] arrReversed(lngUpperBound - lngPtr), arrSet(lngPtr)
-		Next
-		[Set] Reverse, arrReversed
-	End Function
+	' Public Sub Times(varSubprogram, lngTimes)
+	' 	Dim lngCounter
+	' 	For lngCounter = 1 To lngTimes
+	' 		Call varSubprogram()
+	' 	Next
+	' End Sub
 
-	Public Sub Inc(ByRef lngNumber)
-		lngNumber = lngNumber + 1
-	End Sub
+	' Public Function Every(arrArguments, varFunction)
+	' 	Every = Accumulate( _
+	' 		[Function]("boolLeft, boolRight", "Return boolLeft And boolRight"), _
+	' 		Map(varFunction, arrArguments))
+	' End Function
 
-	Public Sub Dec(ByRef lngNumber)
-		lngNumber = lngNumber - 1
-	End Sub
+	' Public Function Some(arrArguments, varFunction)
+	' 	Some = Accumulate( _
+	' 		[Function]("boolLeft, boolRight", "Return boolLeft Or boolRight"), _
+	' 		Map(varFunction, arrArguments))
+	' End Function
 
-	Public Function CStream(varIter)
-	End Function
+	' Public Function Once(varFunction)
+	' 	Set Once = Lambda( _
+	' 		"", _
+	' 		"If boolFirst Then [].Apply varFunction, Arguments : boolFirst = False", _
+	' 		"boolFirst, [], varFunction", _
+	' 		Array(True, [], varFunction))
+	' End Function
 
-	Public Function Chain
-	End Function
+	' Public Function Min(numA, numB)
+	' 	Min = [If](numA < numB, numA, numB)
+	' End Function
 
-	Public Function Value
-	End Function
+	' Public Function Max(numA, numB)
+	' 	Max = [If](numA > numB, numA, numB)
+	' End Function
 
-	Public Function Memorize
-	End Function
+	' Public Function Zip(varLeft, varRight)
+	' 	' Array(a, b, c), Array(d, e, f) ->
+	' 	' Array(Array(a, d), Array(b, e), Array(c, f))
 
-	Public Sub Swap(ByRef varA, ByRef varB)
-		Dim varTemp
-		[Set] varTemp, varA
-		[Set] varA, varB
-		[Set] varB, varTemp
-	End Sub
+	' 	Dim arrLeft, arrRight
+	' 	arrLeft = CArray(varLeft)
+	' 	arrRight = CArray(varRight)
+
+	' 	Dim lngPtr
+	' 	Dim arrZipped()
+	' 	ReDim arrZipped(1)
+	' 	For lngPtr = _
+	' 		0 To Min(UBound(varLeft), UBound(varRight))
+	' 		ReDim Preserve arrZipped( _
+	' 			[If](lngPtr > UBound(arrZipped), _
+	' 				UBound(arrZipped) * 2, _
+	' 				UBound(arrZipped)))
+	' 		arrZipped(lngPtr) = Append( _
+	' 			Array(varLeft(lngPtr)), _
+	' 			Array(varRight(lngPtr)))
+	' 	Next
+
+	' 	ReDim Preserve arrZipped( _
+	' 		Min(UBound(varLeft), UBound(varRight)))
+	' 	Zip = arrZipped
+	' End Function
+
+	' Public Function Curry(varFunction, lngArgumentsCount)
+	' 	[Set] Curry, Lambda("", _
+	' 		"If UBound(Arguments) = lngArgumentsCount - 1 Then" & vbNewLine & _
+	' 		"	Return [].Apply(varFunction, Arguments)" & vbNewLine & _
+	' 		"Else" & vbNewLine & _
+	' 		"	Return [].Curry(" & _
+	' 		"		[].Partial(varFunction, Arguments), " & _
+	' 		"		lngArgumentsCount - UBound(Arguments) - 1)" & _
+	' 		"End If", _
+	' 		"[], varFunction, lngArgumentsCount", _
+	' 		Array([], varFunction, lngArgumentsCount))
+	' End Function
+
+	' Public Function Partial(varFunction, arrArguments)
+	' 	[Set] Partial, Lambda("", _
+	' 		"Return [].Apply(varFunction, [].Append(arrArguments, Arguments))", _
+	' 		"[], varFunction, arrArguments", _
+	' 		Array([], varFunction, arrArguments))
+	' End Function
+
+	' Public Function Reverse(varSet)
+	' 	Dim arrSet, lngPtr, lngUpperBound
+	' 	[Set] arrSet, CArray(varSet)
+	' 	[Set] lngUpperBound, UBound(arrSet)
+	' 	Dim arrReversed()
+	' 	ReDim arrReversed(lngUpperBound)
+	' 	For lngPtr = 0 To lngUpperBound
+	' 		[Set] arrReversed(lngUpperBound - lngPtr), arrSet(lngPtr)
+	' 	Next
+	' 	[Set] Reverse, arrReversed
+	' End Function
+
+	' Public Sub Inc(ByRef lngNumber)
+	' 	lngNumber = lngNumber + 1
+	' End Sub
+
+	' Public Sub Dec(ByRef lngNumber)
+	' 	lngNumber = lngNumber - 1
+	' End Sub
+
+	' Public Function CStream(varIter)
+	' End Function
+
+	' Public Function Chain
+	' End Function
+
+	' Public Function Value
+	' End Function
+
+	' Public Function Memorize
+	' End Function
+
+	' Public Sub Swap(ByRef varA, ByRef varB)
+	' 	Dim varTemp
+	' 	[Set] varTemp, varA
+	' 	[Set] varA, varB
+	' 	[Set] varB, varTemp
+	' End Sub
 End Class
 
 Class Lazy
@@ -388,7 +401,7 @@ Class Pair
 	Public Left, Right
 End Class
 
-Class AnonymousFunction
+Class Lambda
 	Private Sub [Set](ByRef varVariable, varValue)
 		If IsObject(varValue) Then
 			Set varVariable = varValue
@@ -397,15 +410,19 @@ Class AnonymousFunction
 		End If
 	End Sub
 
-	Private varReturnValue
+	Private varRetVal
 	Private Sub Return(varValue)
-		[Set] varReturnValue, varValue
+		varRetVal = Wrap(varValue)
 	End Sub
-	Public Property Get ReturnValue()
-		[Set] ReturnValue, varReturnValue
-	End Property
 
+	' Public Property Get ReturnValue()
+	' 	[Set] ReturnValue, varReturnValue
+	' End Property
+
+	'todo simplify varname to args, argcnt
+	'part into argproc, bindproc, coderun, bindresdore
 	Private strCodeBody, arrSavedBindings
+
 	Public Sub Init(strParameters, strBody, strBindings, arrBindings)
 		Dim lngCounter, varItem
 
@@ -449,7 +466,7 @@ Class AnonymousFunction
 		Next
 	End Sub
 
-	Public Sub Apply(objArguments, Callee)
+	Public Function Apply(objArguments, Callee)
 		' Useful Keywords:
 		' ArgumentsCount, Arguments,
 		' Callee, Return
@@ -457,9 +474,10 @@ Class AnonymousFunction
 		' Other Binded Keywords:
 		' objArguments, strCodeBody, arrSavedBindings,
 		' varReturnValue, Set, ReturnValue, Apply
-		
+
 		' Don't Use: Exit Function
 
+		'dont use error handling!!
 		Execute strCodeBody
 	End Sub
 End Class

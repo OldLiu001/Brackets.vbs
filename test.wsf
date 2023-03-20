@@ -1,0 +1,10 @@
+<job>
+	<script language="JScript" src="Brackets.js"/>
+	<script language="VBScript" src="Brackets.vbs"/>
+    <script language="VBScript">
+        a = z.wrap(CreateObject("Scripting.FileSystemObject"))
+        for each i in zz.unwrap(a).Drives
+            msgbox i
+        next
+    </script>
+</job>

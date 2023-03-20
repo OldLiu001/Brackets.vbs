@@ -1,6 +1,6 @@
 <job>
-	<script src=".\Brackets.js" language="JScript"/>
-	<script src=".\Brackets.vbs" language="VBScript"/>
+	<script src="..\Brackets.js" language="JScript"/>
+	<script src="..\Brackets.vbs" language="VBScript"/>
 	<script language="VBScript">
 	dim []
 	set [] = new brackets
